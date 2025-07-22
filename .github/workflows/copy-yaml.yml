@@ -1,11 +1,11 @@
-name: Copy YAML File Content
+name: Copy Global YAML Content
 
 on:
   push:
     branches:
-      - master # Or your default branch like 'master', 'development'
+      - master # Changed from 'main' to 'master'
     paths:
-      - 'src/global.yaml' # The YAML file you want to copy FROM
+      - 'src/global.yaml' # Your source YAML file
 
 jobs:
   copy-file:
@@ -20,31 +20,53 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20' # Or any stable Node.js version you prefer
+          node-version: '20'
 
-      - name: Install dependencies (if your script needs any, like 'js-yaml')
+      - name: Install dependencies
         run: npm install js-yaml
 
       - name: Run Node.js script to copy YAML
-        run: node .github/scripts/copy_yaml.js
+        run: node .github/scripts/copy_global_yaml.js # Updated script name for clarity
         env:
-          SOURCE_YAML_PATH: src/global.yaml # Input for the script
-          TARGET_YAML_PATH: generated/global.yaml # Input for the script
+          SOURCE_YAML_PATH: src/global.yaml         # Your source path
+          TARGET_YAML_PATH: generated/global.yaml   # Your target path
 
-      - name: Check for changes
-        id: git_diff
-        run: |
-          git diff --quiet --exit-code || echo "::set-output name=changed::true"
-        # Checks if there are any uncommitted changes to the target file.
-        # If yes, sets an output 'changed' to 'true'.
+      # IMPORTANT: I'm keeping the "Check for changes" logic commented out for now,
+      # as you requested to remove it for debugging.
+      # However, once you confirm the commit/push works, it's highly recommended
+      # to re-enable this section for cleaner history and resource saving.
+      # - name: Check for changes (Debug Mode)
+      #   id: git_diff
+      #   run: |
+      #     echo "--- Current working directory: $(pwd) ---"
+      #     echo "--- Files in .github/scripts/ ---"
+      #     ls -la .github/scripts/
+      #     echo "--- Contents of source.yaml ---"
+      #     cat ${{ env.SOURCE_YAML_PATH }} || echo "Source file not found or empty."
+      #     echo "--- Contents of target.yaml (BEFORE diff) ---"
+      #     cat ${{ env.TARGET_YAML_PATH }} || echo "Target file not found or empty."
+      #     echo "--- Git Status ---"
+      #     git status
+      #     echo "--- Git Diff ---"
+      #     git diff
+      #     if git diff --quiet --exit-code; then
+      #       echo "::notice::No changes detected in the working directory."
+      #       echo "::set-output name=changed::false"
+      #     else
+      #       echo "::warning::Changes detected in the working directory!"
+      #       echo "::set-output name=changed::true"
+      #     fi
+      #   shell: bash
 
       - name: Commit and Push changes
-        if: steps.git_diff.outputs.changed == 'true'
+        # if: steps.git_diff.outputs.changed == 'true' # Keep this commented out if not using the 'Check for changes' step
         run: |
           git config user.name "GitHub Actions Bot"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add path/to/target.yaml # Add the target file that was updated
-          git commit -m "chore: Copied content from source.yaml to target.yaml [skip ci]"
+          git add generated/global.yaml # Specific target file to add
+          # This command will attempt to commit. If there are no changes,
+          # it will print a message and the step will still pass.
+          git commit -m "chore: Auto-update generated/global.yaml from src/global.yaml [skip ci]" || echo "No actual changes to commit, proceeding."
           git push
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Automatically provided by GitHub Actions
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
