@@ -1,5 +1,6 @@
 const fs = require('fs');
-const yaml = require('js-yaml'); // We'll install this npm package
+const path = require('path'); // Import the 'path' module
+const yaml = require('js-yaml');
 
 const sourceYamlPath = process.env.SOURCE_YAML_PATH;
 const targetYamlPath = process.env.TARGET_YAML_PATH;
@@ -16,10 +17,18 @@ try {
   // 2. Parse the YAML content
   const parsedYaml = yaml.load(sourceContent);
 
-  // 3. Dump the parsed content back into YAML format (this ensures proper formatting and validation)
+  // 3. Dump the parsed content back into YAML format
   const dumpedYaml = yaml.dump(parsedYaml);
 
-  // 4. Write the content to the target YAML file
+  // --- NEW: Ensure the target directory exists ---
+  const targetDirectory = path.dirname(targetYamlPath);
+  if (!fs.existsSync(targetDirectory)) {
+    console.log(`Creating target directory: ${targetDirectory}`);
+    fs.mkdirSync(targetDirectory, { recursive: true }); // `recursive: true` creates parent directories as needed
+  }
+  // --- END NEW ---
+
+  // 4. Write the content to the target YAML file (this will create the file if it doesn't exist)
   fs.writeFileSync(targetYamlPath, dumpedYaml, 'utf8');
 
   console.log(`Successfully copied content from '${sourceYamlPath}' to '${targetYamlPath}'`);
