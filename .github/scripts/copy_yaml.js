@@ -40,8 +40,7 @@ async function translateObject(obj, targetLanguage) {
             // The prompt asks for direct translation. Experiment with prompts for best results.
             const prompt = `Translate the following English text to ${targetLanguage}. Only return the translated text:\n\n"${value}"`;
             const result = await ai.models.generateContent({contents: prompt, model: "gemini-2.5-flash",});
-            const response = await result.response;
-            const translatedText = response.text();
+            const translatedText = result.text;
             translatedObj[key] = translatedText.trim();
             console.log(`Translated "${value}" to "${translatedObj[key]}"`);
           } catch (error) {
