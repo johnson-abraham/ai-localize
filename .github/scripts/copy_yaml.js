@@ -46,7 +46,7 @@ async function translateObject(obj, targetLanguage) {
               model: "gemini-2.5-flash",
             });
             const translatedText = result.text;
-            translatedObj[key] = `"${translatedText.trim()}"`;
+            translatedObj[key] = translatedText.trim();
             console.log(`Translated "${value}" to "${translatedObj[key]}"`);
           } catch (error) {
             console.error(
@@ -78,7 +78,11 @@ async function main() {
     const frenchStrings = await translateObject(englishStrings, "French");
 
     console.log("Dumping translated content to YAML...");
-    const dumpedYaml = yaml.dump(frenchStrings);
+    const dumpedYaml = yaml.dump(frenchStrings, {
+      lineWidth: -1,
+      quotingType: '"',
+      forceQuotes: true,
+    });
 
     const targetDirectory = path.dirname(targetYamlPath);
     if (!fs.existsSync(targetDirectory)) {
