@@ -1,13 +1,1 @@
-components:
-  services:
-    rubric:
-      template:
-        criteria: "Critère {idx_LOCALIZED}"
-        column1: "Excellent"
-        column2: "Satisfaisant"
-        column3: "Insatisfaisant"
-        column4: "Pauvre"
-      newCriteriaHeading: "New Criterion"
-      newColumnHeading: "Nouveau niveau"
-      newCopyTitle: "{rubricTitle} {date} copie"
-      persistError: "Une erreur est survenue lors de l'enregistrement de la grille. Veuillez rafraîchir la page et réessayer."
+text: "Bonjour le monde"
