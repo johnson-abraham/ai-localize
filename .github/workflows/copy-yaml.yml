@@ -26,7 +26,7 @@ jobs:
         run: npm install js-yaml
 
       - name: Run Node.js script to copy YAML
-        run: node .github/scripts/copy_global_yaml.js # Updated script name for clarity
+        run: node .github/scripts/copy_yaml.js # Updated script name for clarity
         env:
           SOURCE_YAML_PATH: src/global.yaml         # Your source path
           TARGET_YAML_PATH: generated/global.yaml   # Your target path
