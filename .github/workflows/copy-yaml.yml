@@ -1,0 +1,50 @@
+name: Copy YAML File Content
+
+on:
+  push:
+    branches:
+      - master # Or your default branch like 'master', 'development'
+    paths:
+      - 'src/global.yaml' # The YAML file you want to copy FROM
+
+jobs:
+  copy-file:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # Grant permission to write to the repository
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20' # Or any stable Node.js version you prefer
+
+      - name: Install dependencies (if your script needs any, like 'js-yaml')
+        run: npm install js-yaml
+
+      - name: Run Node.js script to copy YAML
+        run: node .github/scripts/copy_yaml.js
+        env:
+          SOURCE_YAML_PATH: src/global.yaml # Input for the script
+          TARGET_YAML_PATH: generated/global.yaml # Input for the script
+
+      - name: Check for changes
+        id: git_diff
+        run: |
+          git diff --quiet --exit-code || echo "::set-output name=changed::true"
+        # Checks if there are any uncommitted changes to the target file.
+        # If yes, sets an output 'changed' to 'true'.
+
+      - name: Commit and Push changes
+        if: steps.git_diff.outputs.changed == 'true'
+        run: |
+          git config user.name "GitHub Actions Bot"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add path/to/target.yaml # Add the target file that was updated
+          git commit -m "chore: Copied content from source.yaml to target.yaml [skip ci]"
+          git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Automatically provided by GitHub Actions
