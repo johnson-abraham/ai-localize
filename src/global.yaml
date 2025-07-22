@@ -1,1 +1,13 @@
-text: "Hello World"
+components:
+  services:
+    rubric:
+      template:
+        criteria: "Criterion {idx_LOCALIZED}"
+        column1: "Excellent"
+        column2: "Satisfactory"
+        column3: "Unsatisfactory"
+        column4: "Poor"
+      newCriteriaHeading: "New Criterion"
+      newColumnHeading: "New Level"
+      newCopyTitle: "{rubricTitle} {date} copy"
+      persistError: "An error occurred while saving the rubric. Please refresh the page and try again."
