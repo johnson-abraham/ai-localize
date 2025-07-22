@@ -1,0 +1,24 @@
+{
+  "name": "ai-localize",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/johnson-abraham/ai-localize.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/johnson-abraham/ai-localize/issues"
+  },
+  "homepage": "https://github.com/johnson-abraham/ai-localize#readme",
+  "description": "",
+  "dependencies": {
+    "@google/genai": "^1.10.0",
+    "js-yaml": "^4.1.0"
+  }
+}

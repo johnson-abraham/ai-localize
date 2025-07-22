@@ -1,17 +1,17 @@
-name: Copy Global YAML Content
+name: Translate Global YAML to French
 
 on:
   push:
     branches:
-      - master # Changed from 'main' to 'master'
+      - master
     paths:
-      - 'src/global.yaml' # Your source YAML file
+      - 'src/global.yaml'
 
 jobs:
-  copy-file:
+  translate-file:
     runs-on: ubuntu-latest
     permissions:
-      contents: write # Grant permission to write to the repository
+      contents: write
 
     steps:
       - name: Checkout repository
@@ -23,50 +23,24 @@ jobs:
           node-version: '20'
 
       - name: Install dependencies
-        run: npm install js-yaml
+        # Removed @google-cloud/translate here
+        run: npm install js-yaml @google/genai
 
-      - name: Run Node.js script to copy YAML
-        run: node .github/scripts/copy_yaml.js # Updated script name for clarity
+      - name: Run Node.js script to translate YAML
+        run: node .github/scripts/copy_yaml.js
         env:
-          SOURCE_YAML_PATH: src/global.yaml         # Your source path
-          TARGET_YAML_PATH: generated/global.yaml   # Your target path
-
-      # IMPORTANT: I'm keeping the "Check for changes" logic commented out for now,
-      # as you requested to remove it for debugging.
-      # However, once you confirm the commit/push works, it's highly recommended
-      # to re-enable this section for cleaner history and resource saving.
-      # - name: Check for changes (Debug Mode)
-      #   id: git_diff
-      #   run: |
-      #     echo "--- Current working directory: $(pwd) ---"
-      #     echo "--- Files in .github/scripts/ ---"
-      #     ls -la .github/scripts/
-      #     echo "--- Contents of source.yaml ---"
-      #     cat ${{ env.SOURCE_YAML_PATH }} || echo "Source file not found or empty."
-      #     echo "--- Contents of target.yaml (BEFORE diff) ---"
-      #     cat ${{ env.TARGET_YAML_PATH }} || echo "Target file not found or empty."
-      #     echo "--- Git Status ---"
-      #     git status
-      #     echo "--- Git Diff ---"
-      #     git diff
-      #     if git diff --quiet --exit-code; then
-      #       echo "::notice::No changes detected in the working directory."
-      #       echo "::set-output name=changed::false"
-      #     else
-      #       echo "::warning::Changes detected in the working directory!"
-      #       echo "::set-output name=changed::true"
-      #     fi
-      #   shell: bash
+          SOURCE_YAML_PATH: src/global.yaml
+          TARGET_YAML_PATH: generated/global.yaml
+          # --- Only GEMINI_API_KEY is needed now ---
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          # ------------------------------------------
 
       - name: Commit and Push changes
-        # if: steps.git_diff.outputs.changed == 'true' # Keep this commented out if not using the 'Check for changes' step
         run: |
           git config user.name "GitHub Actions Bot"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add generated/global.yaml # Specific target file to add
-          # This command will attempt to commit. If there are no changes,
-          # it will print a message and the step will still pass.
-          git commit -m "chore: Auto-update generated/global.yaml from src/global.yaml [skip ci]" || echo "No actual changes to commit, proceeding."
+          git add generated/global.yaml
+          git commit -m "feat: Auto-translate generated/global.yaml to French [skip ci]" || echo "No actual changes to commit, proceeding."
           git push
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
