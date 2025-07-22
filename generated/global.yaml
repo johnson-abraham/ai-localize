@@ -7,9 +7,9 @@ components:
         column2: '"Satisfaisant"'
         column3: '"Insatisfaisant"'
         column4: '"Pauvre"'
-      newCriteriaHeading: '"Nouveau Critère"'
-      newColumnHeading: '"Nouveau niveau"'
-      newCopyTitle: '"{rubricTitle} {date} exemplaire"'
+      newCriteriaHeading: '"New Criterion"'
+      newColumnHeading: '"Nouveau Niveau"'
+      newCopyTitle: '"{rubricTitle} {date} copie"'
       persistError: >-
         "Une erreur est survenue lors de l'enregistrement de la rubrique.
-        Veuillez rafraîchir la page et réessayer."
+        Veuillez actualiser la page et réessayer."
