@@ -46,7 +46,7 @@ async function translateObject(obj, targetLanguage) {
               model: "gemini-2.5-flash",
             });
             const translatedText = result.text;
-            translatedObj[key] = translatedText.trim();
+            translatedObj[key] = `"${translatedText.trim()}"`;
             console.log(`Translated "${value}" to "${translatedObj[key]}"`);
           } catch (error) {
             console.error(
