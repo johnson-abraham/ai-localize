@@ -4,7 +4,7 @@ const yaml = require('js-yaml');
 // Remove this line if you are only using Google GenAI:
 // const { TranslationServiceClient } = require('@google-cloud/translate');
 
-const { GoogleGenerativeAI } = require('@google/genai'); // This is the one you need
+const { GoogleGenAI } = require('@google/genai'); // This is the one you need
 
 const sourceYamlPath = process.env.SOURCE_YAML_PATH;
 const targetYamlPath = process.env.TARGET_YAML_PATH;
@@ -15,10 +15,12 @@ if (!geminiApiKey) {
   console.error('Error: GEMINI_API_KEY environment variable is not set.');
   process.exit(1);
 }
-const genAI = new GoogleGenerativeAI(geminiApiKey);
+// const genAI = new GoogleGenerativeAI(geminiApiKey);
 // You can choose different models here based on your needs: 'gemini-pro', 'gemini-1.5-flash-latest', etc.
-const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+// const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 // ------------------------------
+
+const ai = new GoogleGenAI({});
 
 if (!sourceYamlPath || !targetYamlPath) {
   console.error('Error: SOURCE_YAML_PATH and TARGET_YAML_PATH environment variables must be set.');
@@ -37,7 +39,7 @@ async function translateObject(obj, targetLanguage) {
             console.log(`Translating (GenAI): "${value}"`);
             // The prompt asks for direct translation. Experiment with prompts for best results.
             const prompt = `Translate the following English text to ${targetLanguage}. Only return the translated text:\n\n"${value}"`;
-            const result = await model.generateContent(prompt);
+            const result = await ai.models.generateContent({contents: prompt, model: "gemini-2.5-flash",});
             const response = await result.response;
             const translatedText = response.text();
             translatedObj[key] = translatedText.trim();
