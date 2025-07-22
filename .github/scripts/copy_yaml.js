@@ -78,7 +78,7 @@ async function main() {
     const frenchStrings = await translateObject(englishStrings, "French");
 
     console.log("Dumping translated content to YAML...");
-    const dumpedYaml = yaml.dump(frenchStrings, { indent: 2 });
+    const dumpedYaml = yaml.dump(frenchStrings);
 
     const targetDirectory = path.dirname(targetYamlPath);
     if (!fs.existsSync(targetDirectory)) {

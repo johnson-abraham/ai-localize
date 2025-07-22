@@ -10,4 +10,4 @@ components:
       newCriteriaHeading: "New Criterion"
       newColumnHeading: "New Level"
       newCopyTitle: "{rubricTitle} {date} copy"
-      persistError: "An error occurred while saving the rubric. Please refresh the page and try."
+      persistError: "An error occurred while saving the rubric. Please refresh the page and try again."
