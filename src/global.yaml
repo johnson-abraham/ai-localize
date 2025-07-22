@@ -1,1 +1,311 @@
-text: Hello
+attemptGrading:
+  attemptList:
+    loadingMoreItems: "Loading more items"
+    loadingMoreItemsComplete: "Finished loading items"
+    scrollNextPage: "Scroll next page"
+    scrollPreviousPage: "Scroll previous page"
+  studentCard:
+    studentId: "ID: {studentId}"
+  head:
+    usersTitle: "{name} | {assessmentName}"
+    questionTitle: "Question {questionNumber_LOCALIZED} | {assessmentName}"
+  navigationPaneToggleButton:
+    ariaLabel:
+      show: "Show attempt navigation pane"
+      hide: "Hide attempt navigation pane"
+  additionalContent:
+    titleWithQuestions: "Additional submission content"
+    titleWithContent: "Submission"
+    titleWithoutQuestions: "Submission content"
+    originalityBadgeContent: "{matchPercentage_LOCALIZED}% Match"
+    originalityBadgeProcessing: "Processing"
+    originalityTextScoreLabel: "Text score:"
+    originalityBadgeContentError: "Error"
+    originalityBadgeContentWarning: "Warning"
+    originalityBadgePostErrorMessage: "The originality processor is unavailable"
+  submissionReceipt:
+    label: "Receipt: {receiptId}"
+  content:
+    screenReaderTabSetHeading: "Instructions and submission content tabs"
+    mainSubmissionContent: "Main submission content"
+    staticAssessmentContent:
+      title: "Assessment content"
+    staticInstructions:
+      title: "Instructions"
+    staticSurveyContent:
+      title: "Form content"
+    externalSubmission:
+      title: "Offline submission"
+      descriptions:
+        privileged: "This assessment is set to collect submissions offline. Though students can't make submissions online, they can view their grades for this assessment online."
+        notPrivileged:
+          attempted: "You submitted this work offline."
+          notAttempted: "Your instructor wants you to submit your work offline, but you can view your grade online."
+  body:
+    bodyHeader:
+      overflow:
+        overallFeedbackTitle: "Overall Feedback"
+        expandOverallFeedbackButtonAriaLable: "Toggle expand overall feedback"
+        ariaLabel: "More options for attempt {attemptNumber_LOCALIZED} submitted by {studentName}"
+        options:
+          addEditExceptions: "Add or edit exceptions"
+          postGrade: "Post grade"
+          deleteAttempt: "Delete attempt"
+          undoOverride: "Remove Override"
+          excludeAttempt:
+            title: "Exclude Attempt"
+            ariaLabel: "Exclude Attempt {attemptNumber_LOCALIZED}"
+          undoExcludeAttempt: "Undo Exclude Attempt"
+          showOverrideGradePill: "Override Final Grade"
+      exceedTime.plural: "{exceedTime, plural, =0{Exceeded time limit by less than one minute} one{Exceeded time limit by # minute} two{Exceeded time limit by # minutes} few{Exceeded time limit by # minutes} many{Exceeded time limit by # minutes} other{Exceeded time limit by # minutes}}"
+      exclude: "EXCLUDED"
+      finalGradeSettings: "Final grade settings: {settingLabel}"
+      finalGrade: "Final Grade"
+      pastTime: "PAST TIME"
+      posted: "Posted"
+      override: "OVERRIDE"
+      undo: "Undo"
+      selectAttempt: "Attempt"
+      questionsAnsweredAfterTimeLimit.plural: "{count, plural, =0{# questions answered after time limit} one{# question answered after time limit} two{# questions answered after time limit} few{# questions answered after time limit} many{# questions answered after time limit} other{# questions answered after time limit}}"
+    questions:
+      ariaLabel: "Questions"
+      questionTitle: "Question {index_LOCALIZED}"
+      feedback: "Feedback"
+      feedbackEditButtonAriaLabel:
+        questionNumber: "Edit Feedback - Question {number_LOCALIZED}"
+        studentName: "Edit Feedback - {user_LOCALIZED_USERNAME_SHORT}"
+      questionFeedback:
+        questionNumber: "Feedback - Question {number_LOCALIZED}"
+        studentName: "Feedback - {user_LOCALIZED_USERNAME_SHORT}"
+      questionHeader:
+        presentationOnlyQuestionTitle: "Assessment Content"
+        presentationOnlyAriaLabelCloudSubType: "Assessment content {index_LOCALIZED}, Cloud file"
+        presentationOnlyAriaLabelEmbeddedSubType: "Assessment content {index_LOCALIZED}, Embedded file"
+        presentationOnlyAriaLabelFileSubType: "Assessment content {index_LOCALIZED}, File"
+        presentationOnlyAriaLabelTextSubType: "Assessment content {index_LOCALIZED}, Text"
+        presentationOnlyAriaLabelUnknownSubType: "Assessment content {index_LOCALIZED}, Unknown file"
+        presentationOnlyQuestionTitleForSurvey: "Form content"
+        autoGraded: "(Auto-graded)"
+        variableValue: "{value_LOCALIZED}"
+        overflow:
+          ariaLabel: "More options for {relatedContent}"
+          options:
+            editRegrade: "Edit/Regrade"
+            edit: "Edit"
+    toolbar:
+      closeFeedbackPanel: "Close feedback panel"
+      feedbackPanel: "Feedback panel"
+      gradingRubricTitle: "Grading Rubric"
+      groupMembersTitle: "Group Members"
+      groupMemberCount: "Group Members ({count_LOCALIZED})"
+      editOverallFeedbackAriaLabel: "Edit overall feedback"
+      openFeedbackPanel: "Open feedback panel"
+      openGradingRubric: "Open grading rubric"
+      openOverallFeedback: "Open overall feedback"
+      openGroupMembers: "Open group members"
+      overallFeedbackTitle: "Overall Feedback"
+      safeAssign:
+        header: "Originality Report"
+        reportSummary: "Report Summary"
+        report: "Originality Reports ({count_LOCALIZED})"
+        reports: "REPORTS ({count})"
+        overall: "Overall Text Matching"
+        averageMatch: "Average Match"
+        classAverage: "Class Average"
+        highestMatch: "Highest Match"
+        questionTitle: "Question {index_LOCALIZED}"
+        additionalContent: "Additional content"
+        riskLow: "Low Risk"
+        riskMed: "Medium Risk"
+        riskHigh: "High Risk"
+        riskError: "Processing Error"
+        riskLowDesc: "This attempt includes some quotes and a few common pieces of text that match external sources. Typically, no further analysis is required because sufficient originality exists."
+        riskMedDesc: "This attempt includes extensive quoted or paraphrased material that may not be original. Review the material and determine if content is properly attributed to its source."
+        riskHighDesc: "The text in this attempt was likely copied from other sources because it includes excessive quoted or paraphrased material. Review the attempt for plagiarism."
+        riskErrorDesc: "SafeAssign couldn’t process some or all files."
+        processingErrorLabel: "Error"
+        error.file.size.too.large: "The file is too big. SafeAssign can’t process files larger than 10MB."
+        error.unsupported.file.type: "SafeAssign can’t process this file type."
+        error.could.not.process: "SafeAssign can’t process this file. Please try again later."
+        noValidReports: "SafeAssign couldn't process the submitted files."
+      groupMembers:
+        loadingMemberItem: "Loading group member"
+        loadingMemberList: "Loading group members"
+        groupMemberCard:
+          individualFeedback:
+            title: "Feedback"
+            ariaLabel: "Open the rich text editor to provide feedback for {studentName}"
+    users:
+      dismissDeleteAttemptConfirmation: "Dismiss delete attempt confirmation"
+      loadingSubmissionContent: "Loading submission content"
+  questions:
+    questionsCardList:
+      xOfYResponsesToGrade.plural: "{count, plural, =0{{numResponsesToGradeXOfY_LOCALIZED} responses to grade} one{{numResponsesToGradeXOfY_LOCALIZED} responses to grade} two{{numResponsesToGradeXOfY_LOCALIZED} responses to grade} few{{numResponsesToGradeXOfY_LOCALIZED} responses to grade} many{{numResponsesToGradeXOfY_LOCALIZED} responses to grade} other{{numResponsesToGradeXOfY_LOCALIZED} responses to grade}}"
+      responsesToGrade.plural: "{count, plural, =0{{num_LOCALIZED} responses to grade} one{{num_LOCALIZED} response to grade} two{{num_LOCALIZED} responses to grade} few{{num_LOCALIZED} responses to grade} many{{num_LOCALIZED} responses to grade} other{{num_LOCALIZED} responses to grade}}"
+      numResponsesToGradeXOfY: "{numNeedsGrading_LOCALIZED} / {numAttempts_LOCALIZED}"
+      attemptsGradedXOfY: "{numGraded_LOCALIZED} / {numAttempts_LOCALIZED}"
+      loadingQuestion: "Loading question"
+      loadingQuestions: "Loading questions"
+      noQuestionsToDisplay: "No questions to display."
+      pool: "Pool"
+      questionNumber: "Question {number_LOCALIZED}"
+      questionNumberRange: "One of pooled questions from {from_LOCALIZED} to {until_LOCALIZED}"
+      questionBlockRange: "{fromLocalized}-{untilLocalized}"
+      questionsRandomized: "All questions were randomly ordered for students"
+    questionAttempt:
+      emptyContent: "Empty content."
+      loading:
+        course: "Loading student submissions"
+        organization: "Loading participant submissions"
+    questionHeader:
+      poolExplanation: "This question was 1 of {numQuestionsDrawn_LOCALIZED} drawn randomly from a pool of {numQuestionsAvailable_LOCALIZED} {numQuestionsAvailable, plural, =0{questions} one{question} two{questions} few{questions} many{questions} other{questions}}. Only student attempts that included this question are shown."
+      questionDetails: "Question details"
+      showFullQuestionDetails: "Show full question details"
+      saveSuccessMessage: "Question changes saved successfully"
+      editRegradeDiscardModel:
+        title: "Discard changes?"
+        description: "You have unsaved work. If you leave the editor your changes won’t be saved."
+    studentHeader:
+      attemptNotLatest: "This answer is not part of the student's latest attempt at the assessment"
+      empty: "Empty"
+      excludeAttempt: "This answer is part of an excluded attempt and will not count towards final grade"
+  usersWithAttemptList:
+    title: "{finalGrade}: {attemptAggregationModel}"
+    questionsGraded: "{grade_LOCALIZED}/{totalGraded_LOCALIZED} questions graded"
+    submitted: "Submitted: {date}"
+    loadingItem:
+      course: "Loading student"
+      organization: "Loading participant"
+    loadingList:
+      course: "Loading students"
+      organization: "Loading participants"
+    loadingGroupItem: "Loading group"
+    loadingGroupList: "Loading groups"
+    subtitle:
+      course: "{totalStudents_LOCALIZED} students, {ungradedStudents_LOCALIZED} ungraded"
+      organization: "{totalStudents_LOCALIZED} participants, {ungradedStudents_LOCALIZED} ungraded"
+    removeOverrideLabel: "Remove Override"
+    postGradeLabel: "Post Grade"
+    gradePostedLabel: "Grade Posted"
+    postGradesLabel: "Post Grades"
+    postGradeDialog:
+      title:  "Post Grade?"
+      content:
+        course: "When you post grades, students can view them and any feedback you provided. All feedback for all attempts, even ungraded attempts, shows to students."
+        organization: "When you post grades, participants can view them and any feedback you provided. All feedback for all attempts, even ungraded attempts, shows to participants."
+      postGrade: "Post Grade"
+    postAllGradesDialog:
+      title: "Post All Grades?"
+      postAllGrades: "Post All Grades"
+    noItemsToDisplay:
+      course: "No students to display"
+      organization: "No participants to display"
+    noGroupsToDisplay: "No groups to display"
+    attemptDeletedBanner: "Attempt successfully deleted. Displaying next available attempt."
+    attemptDeletedZeroStateLabel:
+      course: "Submissions for this student have been deleted"
+      organization: "Submissions for this participant have been deleted"
+    attemptDeletedZeroStateLabelGroup: "Submissions for this group have been deleted"
+  navigationTabs:
+    gradeBy: "Grade by"
+    gradeByUserTitle:
+      course: "Students"
+      organization: "Participants"
+    gradeByGroupTitle:
+      course: "Groups"
+      organization:  "Groups"
+    gradeByQuestionTitle: "Questions"
+    ariaLabel: "Navigation sidebar"
+    gradeByQuestionNotAvailableQuestionCount: "Grade by Question is not available for assessments without questions"
+    gradeByQuestionNotAvailableQuestionCountForSurvey: "View by Question is not available for forms without questions"
+    gradeByQuestionNotAvailableAnonymousGrading: "Grade by Question is not yet available for anonymous assessments with questions"
+    gradeByQuestionNotAvailablePermanentAnonymous: "View by Question is not available for anonymous submissions"
+    gradeByQuestionNotAvailableGroupContent: "Grade by Question is not yet available for group assessments with questions"
+    showGradedSubmissions: "Show graded responses"
+    questionsCardList:
+      ariaLabel: "Questions"
+    studentsCardList:
+      ariaLabel:
+        course: "Students"
+        organization: "Participants"
+    groupsCardList:
+      ariaLabel: "Groups"
+    navigationPanel: "Navigation panel"
+    closeNavigationPanel: "Close navigation panel"
+  aggregationModel:
+    average: "Average of all attempts"
+    first: "First attempt with a grade"
+    highest: "Attempt with highest grade"
+    last: "Last attempt with a grade"
+    lowest: "Attempt with lowest grade"
+  gradingModel:
+    allAttempts: "Grading all attempts"
+    gradingAttempt:
+      label: "Grading {attempt}"
+      attempt: # These values are used as the attempt variable in label
+        first: "first attempt"
+        last: "latest attempt"
+    aggregationDescription:
+      label: "{model} calculates final grade"
+      model: # These values are used as the model variable in label
+        highestGrade: "Highest grade"
+        lowestGrade: "Lowest grade"
+        averageGrade: "Average grade"
+  changePostedGradeModal:
+    title: "Change the Grade?"
+    body:
+      course: "You already posted a grade for this submission. If you change a question's points, you need to post the grade again so that the student sees the new grade. Do you want to continue?"
+      organization: "You already posted a grade for this submission. If you change a question's points, you need to post the grade again so that the participant sees the new grade. Do you want to continue?"
+    continue: "Continue"
+  rubric:
+    rubricConfirmationDialog:
+      unsavableFeedback:
+        header: "Discard Rubric Feedback?"
+        content: "You have feedback in the rubric that cannot be saved. To save it, please select \"Cancel\" and choose a grade for the associated criterion item. Otherwise, select \"Discard and continue\" to discard the feedback."
+      savingFeedback:
+        header: "Saving Rubric Feedback"
+        content: "Please wait while your rubric feedback is saved. To discard the feedback and continue anyway, select \"Discard and continue\"."
+      cancelButtonLabel: "Cancel"
+      discardButtonLabel: "Discard and continue"
+  deleteAttemptModal:
+    title: "Delete Attempt?"
+    body: "Do you want to delete the attempt and any grade associated with it?"
+  excludeAttemptModal:
+    title: "Exclude Attempt"
+    body: "The student has no remaining attempts and a final grade will not be calculated. Do you want to exclude this attempt?"
+    excludeButtonLabel: "Exclude"
+  filesViewer:
+    downloadFiles: "Download original files"
+    downloadFile: "Download original file - {name}"
+  studentNavigation:
+    nextStudent:
+      course: "Next Student"
+      organization: "Next Participant"
+    previousStudent:
+      course: "Previous Student"
+      organization: "Previous Participant"
+  questionNavigation:
+    nextQuestion: "Next Question"
+    previousQuestion: "Previous Question"
+  groupNavigation:
+    nextGroup: "Next Group"
+    previousGroup: "Previous Group"
+  rubricPopOut:
+    rubric:
+      title: "Rubric"
+      rubricScoreLabel: "Rubric Score"
+      buttonLabel: "Open rubric in new window"
+    criteria: "Criteria"
+    regradeButton: "Regrade with rubric"
+    feedback:
+      title: "Feedback"
+      placeholder: "Enter your feedback"
+      addFeedback: "Add feedback"
+      discardFeedback: "Discard feedback"
+    windowTitle: "Rubric - {userName} - {contentTitle}"
+    dialog:
+      description: "If you continue without saving your changes to the rubric, you will lose your changes."
+      action:
+        continue: "Continue Working"
+    criterion:
+      percentage: "{percentage_LOCALIZED}% of total grade"
