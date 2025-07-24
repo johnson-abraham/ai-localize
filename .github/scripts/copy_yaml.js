@@ -2,7 +2,7 @@ const fs = require("fs");
 const path = require("path");
 const { execSync } = require("child_process"); // For running git commands
 const yaml = require("js-yaml");
-const { GoogleGenerativeAI } = require("@google/genai");
+const { GoogleGenAI } = require("@google/genai");
 
 const sourceYamlPath = process.env.SOURCE_YAML_PATH; // src/global.yaml (English)
 const targetYamlPath = process.env.TARGET_YAML_PATH; // generated/global.yaml (French)
