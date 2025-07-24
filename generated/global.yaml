@@ -2,12 +2,14 @@ components:
   services:
     rubric:
       template:
-        criteria: "Critère {idx_LOCALIZED}"
-        column1: "Excellent"
-        column2: "Satisfaisant"
-        column3: "Insatisfaisant"
-        column4: "Pauvre"
-      newCriteriaHeading: "Nouveau Critère"
-      newColumnHeading: "Nouveau Niveau"
-      newCopyTitle: "{rubricTitle} {date} copie"
-      persistError: "Une erreur est survenue lors de l'enregistrement de {the rubric}. Veuillez actualiser la page et réessayez."
+        criteria: Critère {idx_LOCALIZED}
+        column1: Excellent
+        column2: Satisfaisant
+        column3: Insatisfaisant
+        column4: Pauvre
+      newCriteriaHeading: Nouveau Critère
+      newColumnHeading: Nouveau Niveau
+      newCopyTitle: '{rubricTitle} {date} copie'
+      persistError: >-
+        Une erreur est survenue lors de l'enregistrement de la grille
+        d'évaluation. Veuillez rafraîchir la page et réessayer.
