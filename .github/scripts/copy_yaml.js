@@ -128,7 +128,7 @@ async function translateString(text, targetLanguage) {
   }
   try {
     console.log(`Translating (GenAI) to ${targetLanguage}: "${text}"`);
-    const prompt = `Translate the following English text to ${targetLanguage}. Only return the translated text:\n\n"${text}"`;
+    const prompt = `Translate the following English text to ${targetLanguage}. Do not translate the texts within the {}. Only return the translated text:\n\n"${text}"`;
     const result = await ai.models.generateContent({
       contents: prompt,
       model: "gemini-2.5-flash",
