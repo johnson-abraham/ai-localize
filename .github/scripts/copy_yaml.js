@@ -4,8 +4,7 @@ const { execSync } = require("child_process");
 const yaml = require("js-yaml");
 const { GoogleGenAI } = require("@google/genai");
 
-const sourceYamlPath = process.env.SOURCE_YAML_PATH;
-const targetYamlPath = process.env.TARGET_YAML_PATH;
+const sourceYamlPath = process.env.SOURCE_YAML_PATH; // src/global.yaml (English)
 
 const geminiApiKey = process.env.GEMINI_API_KEY;
 if (!geminiApiKey) {
@@ -15,12 +14,23 @@ if (!geminiApiKey) {
 
 const ai = new GoogleGenAI({});
 
-if (!sourceYamlPath || !targetYamlPath) {
-  console.error(
-    "Error: SOURCE_YAML_PATH and TARGET_YAML_PATH environment variables must be set.",
-  );
+if (!sourceYamlPath) {
+  // Only sourceYamlPath is a fixed env var now
+  console.error("Error: SOURCE_YAML_PATH environment variable must be set.");
   process.exit(1);
 }
+
+// --- NEW: Define the target locales and their corresponding language codes for GenAI ---
+const LOCALE_CONFIGS = [
+  { folder: "es-es", langCode: "es", name: "Spanish (Spain)" },
+  { folder: "fr-fr", langCode: "fr", name: "French (France)" },
+  { folder: "jp-jp", langCode: "ja", name: "Japanese (Japan)" }, // 'ja' is common for Japanese in translation APIs
+  { folder: "ko-kr", langCode: "ko", name: "Korean (Korea)" },
+  { folder: "ar-sa", langCode: "ar", name: "Arabic (Saudi Arabia)" },
+  // Add more locales here as needed, following the 'folder' and 'langCode' pattern
+];
+
+// --------------------------------------------------------------------------------------
 
 function getFileContentFromCommit(filePath, commitRef) {
   try {
@@ -98,7 +108,8 @@ async function translateString(text, targetLanguage) {
     return text;
   }
   try {
-    console.log(`Translating (GenAI): "${text}"`);
+    console.log(`Translating (GenAI) to ${targetLanguage}: "${text}"`);
+    // The prompt now uses the 'targetLanguage' name directly as passed (e.g., "French", "Spanish (Spain)")
     const prompt = `Translate the following English text to ${targetLanguage}. Only return the translated text:\n\n"${text}"`;
     const result = await ai.models.generateContent({
       contents: prompt,
@@ -108,7 +119,9 @@ async function translateString(text, targetLanguage) {
     console.log(`Translated "${text}" to "${translatedText}"`);
     return translatedText.trim();
   } catch (error) {
-    console.error(`ERROR during GenAI translation for text "${text}":`);
+    console.error(
+      `ERROR during GenAI translation for text "${text}" to ${targetLanguage}:`,
+    );
     console.error(error);
     if (error.response) {
       console.error(
@@ -122,7 +135,7 @@ async function translateString(text, targetLanguage) {
     } else if (error.message) {
       console.error("Error message:", error.message);
     }
-    return `[Translation Error with GenAI] ${text}`;
+    return `[Translation Error with GenAI to ${targetLanguage}] ${text}`; // Indicate error
   }
 }
 
@@ -145,7 +158,7 @@ function setDeep(obj, path, value) {
 
 async function main() {
   try {
-    // 1. Get current and previous versions of src/global.yaml
+    // 1. Get current and previous versions of src/global.yaml (Source is common for all locales)
     console.log(`Reading current source file: ${sourceYamlPath}`);
     const currentSourceContent = fs.readFileSync(sourceYamlPath, "utf8");
     const currentEnglishStrings = yaml.load(currentSourceContent);
@@ -162,107 +175,153 @@ async function main() {
       ? yaml.load(previousSourceContent)
       : {};
 
-    // 2. Load existing target file (French) or initialize if not exists
-    let existingFrenchStrings = {};
-    if (fs.existsSync(targetYamlPath)) {
-      console.log(`Loading existing target file: ${targetYamlPath}`);
-      const existingTargetContent = fs.readFileSync(targetYamlPath, "utf8");
-      existingFrenchStrings = yaml.load(existingTargetContent);
-    } else {
+    // Flag to track if ANY locale file was actually updated across all iterations
+    let overallHasActualChanges = false;
+
+    // --- Loop through each locale ---
+    for (const localeConfig of LOCALE_CONFIGS) {
+      const localeFolder = localeConfig.folder;
+      const targetLangName = localeConfig.name; // Use the human-readable name for prompts/logging
+
+      // Dynamically construct the target path for the current locale
+      const currentTargetYamlPath = `generated/${localeFolder}/global.yaml`;
+      const currentTargetDirectory = path.dirname(currentTargetYamlPath);
+
       console.log(
-        `Target file ${targetYamlPath} does not exist. Will create a new one.`,
+        `\n--- Processing locale: ${targetLangName} (${localeFolder}) ---`,
       );
-    }
 
-    // Clone existingFrenchStrings to modify (important to avoid modifying original reference if used elsewhere)
-    const finalFrenchStrings = JSON.parse(
-      JSON.stringify(existingFrenchStrings),
-    ); // Simple deep clone
+      // 2. Load existing target file for this specific locale or initialize if not exists
+      let existingLocaleStrings = {};
+      if (fs.existsSync(currentTargetYamlPath)) {
+        console.log(`Loading existing target file: ${currentTargetYamlPath}`);
+        const existingTargetContent = fs.readFileSync(
+          currentTargetYamlPath,
+          "utf8",
+        );
+        existingLocaleStrings = yaml.load(existingTargetContent);
+      } else {
+        console.log(
+          `Target file ${currentTargetYamlPath} does not exist. Will create a new one.`,
+        );
+      }
 
-    let hasActualChanges = false; // Flag to check if any final content change occurred
-
-    // --- Handle Deleted Keys First ---
-    console.log("Checking for deleted keys...");
-    if (removeDeletedKeys(finalFrenchStrings, currentEnglishStrings)) {
-      hasActualChanges = true;
-    }
-
-    // --- Handle Added/Modified Keys ---
-    console.log("Identifying added/modified strings...");
-    const stringsToTranslate = getChangedStrings(
-      currentEnglishStrings,
-      previousEnglishStrings,
-    );
-    const changedKeys = Object.keys(stringsToTranslate);
-
-    if (changedKeys.length === 0 && !hasActualChanges) {
-      // No changes AND no deletions
-      console.log(
-        "No new, modified, or deleted strings found in src/global.yaml. No translation or file update needed.",
+      // Clone existingLocaleStrings to modify (important to avoid modifying original reference)
+      const finalLocaleStrings = JSON.parse(
+        JSON.stringify(existingLocaleStrings),
       );
-      process.exit(0); // Exit successfully
-    }
+      let hasChangesForThisLocale = false; // Flag for this specific locale's changes
 
-    if (changedKeys.length > 0) {
-      console.log(`Found ${changedKeys.length} strings to translate/update.`);
-      console.log("Keys to translate:", changedKeys.join(", "));
+      // --- Handle Deleted Keys ---
+      console.log(`[${localeFolder}] Checking for deleted keys...`);
+      if (removeDeletedKeys(finalLocaleStrings, currentEnglishStrings)) {
+        hasChangesForThisLocale = true;
+      }
 
-      for (const key of changedKeys) {
-        const englishText = stringsToTranslate[key];
-        const translatedText = await translateString(englishText, "French");
+      // --- Handle Added/Modified Keys ---
+      console.log(`[${localeFolder}] Identifying added/modified strings...`);
+      const stringsToTranslate = getChangedStrings(
+        currentEnglishStrings,
+        previousEnglishStrings,
+      );
+      const changedKeys = Object.keys(stringsToTranslate);
 
-        // Retrieve current value from the working 'finalFrenchStrings'
-        let currentTranslatedValue;
-        try {
-          // Traverse the object to get the value at the specific path
-          currentTranslatedValue = key
-            .split(".")
-            .reduce((o, i) => o && o[i], finalFrenchStrings);
-        } catch (e) {
-          currentTranslatedValue = undefined; // Path might not exist in existing structure
-        }
+      if (changedKeys.length === 0 && !hasChangesForThisLocale) {
+        console.log(
+          `[${localeFolder}] No new, modified, or deleted strings found. Skipping translation for this locale.`,
+        );
+        continue; // Move to the next locale
+      }
 
-        if (translatedText !== currentTranslatedValue) {
-          setDeep(finalFrenchStrings, key, translatedText);
-          hasActualChanges = true;
-          console.log(`Updated translation for key "${key}"`);
-        } else {
-          console.log(
-            `No change in translated text for key "${key}", skipping update.`,
+      if (changedKeys.length > 0) {
+        console.log(
+          `[${localeFolder}] Found ${changedKeys.length} strings to translate/update.`,
+        );
+        console.log(
+          `[${localeFolder}] Keys to translate:`,
+          changedKeys.join(", "),
+        );
+
+        for (const key of changedKeys) {
+          const englishText = stringsToTranslate[key];
+          // Pass the human-readable language name for better prompt performance
+          const translatedText = await translateString(
+            englishText,
+            targetLangName,
           );
+
+          // Retrieve current value from the working 'finalLocaleStrings'
+          let currentTranslatedValue;
+          try {
+            currentTranslatedValue = key
+              .split(".")
+              .reduce((o, i) => o && o[i], finalLocaleStrings);
+          } catch (e) {
+            currentTranslatedValue = undefined;
+          }
+
+          if (translatedText !== currentTranslatedValue) {
+            setDeep(finalLocaleStrings, key, translatedText);
+            hasChangesForThisLocale = true;
+            console.log(
+              `[${localeFolder}] Updated translation for key "${key}"`,
+            );
+          } else {
+            console.log(
+              `[${localeFolder}] No change in translated text for key "${key}", skipping update.`,
+            );
+          }
         }
       }
-    }
 
-    if (!hasActualChanges) {
+      if (!hasChangesForThisLocale) {
+        console.log(
+          `[${localeFolder}] No actual content changes (additions, modifications, or deletions) detected. No file write needed for this locale.`,
+        );
+        continue; // Move to the next locale
+      }
+
+      // 5. Dump the final content back into YAML format for this locale
       console.log(
-        "No actual content changes (additions, modifications, or deletions) were detected after processing. No file write needed.",
+        `[${localeFolder}] Dumping final ${targetLangName} content to YAML...`,
       );
-      process.exit(0); // Exit successfully, no file changes.
+      const dumpedYaml = yaml.dump(finalLocaleStrings, {
+        lineWidth: -1,
+        quotingType: '"',
+        forceQuotes: true,
+      });
+
+      // 6. Ensure the target directory exists for this locale
+      if (!fs.existsSync(currentTargetDirectory)) {
+        console.log(
+          `[${localeFolder}] Creating target directory: ${currentTargetDirectory}`,
+        );
+        fs.mkdirSync(currentTargetDirectory, { recursive: true });
+      }
+
+      // 7. Write the content to the target YAML file for this locale
+      console.log(
+        `[${localeFolder}] Writing updated translated content to target file: ${currentTargetYamlPath}`,
+      );
+      fs.writeFileSync(currentTargetYamlPath, dumpedYaml, "utf8");
+
+      console.log(
+        `[${localeFolder}] Successfully updated changed strings in '${currentTargetYamlPath}'`,
+      );
+      overallHasActualChanges = true; // Mark that at least one file was updated
+    } // End of locale loop
+
+    // Final check to see if any locale file was updated across all iterations
+    if (!overallHasActualChanges) {
+      console.log(
+        "No changes detected in any locale file across all configured locales. Exiting successfully without creating a PR.",
+      );
+      process.exit(0);
     }
 
-    // 5. Dump the final French content back into YAML format
-    console.log("Dumping final French content to YAML...");
-    const dumpedYaml = yaml.dump(finalFrenchStrings, {
-      lineWidth: -1,
-      quotingType: '"',
-      forceQuotes: true,
-    });
-
-    // 6. Ensure the target directory exists
-    const targetDirectory = path.dirname(targetYamlPath);
-    if (!fs.existsSync(targetDirectory)) {
-      console.log(`Creating target directory: ${targetDirectory}`);
-      fs.mkdirSync(targetDirectory, { recursive: true });
-    }
-
-    // 7. Write the content to the target YAML file (French)
     console.log(
-      `Writing updated translated content to target file: ${targetYamlPath}`,
+      "Translation process completed for all locales. Changes detected, proceeding to PR creation.",
     );
-    fs.writeFileSync(targetYamlPath, dumpedYaml, "utf8");
-
-    console.log(`Successfully updated changed strings in '${targetYamlPath}'`);
   } catch (error) {
     console.error(`Fatal error in translation process: ${error.message}`);
     process.exit(1);

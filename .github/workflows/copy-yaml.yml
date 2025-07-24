@@ -1,4 +1,4 @@
-name: Translate Changed Global YAML to French (Incremental)
+name: Translate All Locales (Incremental)
 
 on:
   push:
@@ -8,7 +8,7 @@ on:
       - 'src/global.yaml' # Triggers only if 'src/global.yaml' changes
 
 jobs:
-  translate-file:
+  translate-all-locales: # Renamed job for clarity
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -18,10 +18,7 @@ jobs:
       - name: Checkout repository with history
         uses: actions/checkout@v4
         with:
-          # Fetch the current commit and its immediate parent for comparison
-          # fetch-depth: 2 is usually enough to get the previous commit.
-          # fetch-depth: 0 would get full history, but is slower.
-          fetch-depth: 2
+          fetch-depth: 2 # Fetch the current commit and its immediate parent for comparison
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -31,35 +28,35 @@ jobs:
       - name: Install dependencies
         run: npm install js-yaml @google/genai
 
-      - name: Run Node.js script to translate ONLY changed YAML strings
+      - name: Run Node.js script to translate ONLY changed YAML strings for all locales
         run: node .github/scripts/copy_yaml.js # Your script file name
         env:
           SOURCE_YAML_PATH: src/global.yaml
-          TARGET_YAML_PATH: generated/global.yaml
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-          # Pass the SHA of the commit BEFORE the current push
-          # This is crucial for `git show` to get the previous version of the file
           GITHUB_SHA_BEFORE: ${{ github.event.before }}
 
-      - name: Create Pull Request
+      - name: Create Pull Request for all locale changes
         id: cpr
         uses: peter-evans/create-pull-request@v6
         with:
           token: ${{ secrets.PAT_FOR_PR }}
-          commit-message: "feat: Auto-translate updated strings in generated/global.yaml" # Updated commit message
-          branch: feature/auto-translate # Using a fixed branch name for continuous updates to the same PR
-          delete-branch: false
-          title: "🤖 Auto-translate: Update French Localization"
+          commit-message: "feat: Auto-translate updated strings for all locales" # General commit message
+          branch: feature/auto-translate # Fixed, long-lived branch name
+          delete-branch: false # Keeps the branch for continuous updates
+          title: "🤖 Auto-translate: Update All Locale Localizations" # General PR title
           body: |
-            This Pull Request automatically updates `generated/global.yaml` with French translations
+            This Pull Request automatically updates `generated/<locale>/global.yaml` files with translations
             based on **only the changed strings** detected in `src/global.yaml`.
 
+            Locales updated: es-es, fr-fr, jp-jp, ko-kr, ar-sa
             Triggered by commit: ${{ github.sha }}
             By: @${{ github.actor }}
             
             Please review and merge if translations are correct.
-          labels: automated, localization, feature
-          add-paths: 'generated/global.yaml'
+          labels: automated, localization, feature, multi-locale
+          # --- IMPORTANT CHANGE HERE: Use a wildcard for multiple files ---
+          add-paths: 'generated/**/*.yaml'
+          # -----------------------------------------------------------------
 
       - name: Check Pull Request Output
         if: steps.cpr.outputs.pull-request-number
