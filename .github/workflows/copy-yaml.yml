@@ -47,8 +47,8 @@ jobs:
         with:
           token: ${{ secrets.PAT_FOR_PR }}
           commit-message: "feat: Auto-translate updated strings in generated/global.yaml" # Updated commit message
-          branch: auto-translate/french-localization # Using a fixed branch name for continuous updates to the same PR
-          delete-branch: true
+          branch: feature/auto-translate # Using a fixed branch name for continuous updates to the same PR
+          delete-branch: false
           title: "🤖 Auto-translate: Update French Localization"
           body: |
             This Pull Request automatically updates `generated/global.yaml` with French translations
