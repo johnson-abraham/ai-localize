@@ -1,22 +1,17 @@
 const fs = require("fs");
 const path = require("path");
-const { execSync } = require("child_process"); // For running git commands
+const { execSync } = require("child_process");
 const yaml = require("js-yaml");
 const { GoogleGenAI } = require("@google/genai");
 
-const sourceYamlPath = process.env.SOURCE_YAML_PATH; // src/global.yaml (English)
-const targetYamlPath = process.env.TARGET_YAML_PATH; // generated/global.yaml (French)
+const sourceYamlPath = process.env.SOURCE_YAML_PATH;
+const targetYamlPath = process.env.TARGET_YAML_PATH;
 
 const geminiApiKey = process.env.GEMINI_API_KEY;
-
 if (!geminiApiKey) {
   console.error("Error: GEMINI_API_KEY environment variable is not set.");
   process.exit(1);
 }
-// const genAI = new GoogleGenerativeAI(geminiApiKey);
-// You can choose different models here based on your needs: 'gemini-pro', 'gemini-1.5-flash-latest', etc.
-// const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
-// ------------------------------
 
 const ai = new GoogleGenAI({});
 
@@ -27,44 +22,29 @@ if (!sourceYamlPath || !targetYamlPath) {
   process.exit(1);
 }
 
-/**
- * Gets the content of a file from a specific Git commit.
- * @param {string} filePath - The path to the file.
- * @param {string} commitRef - The Git commit reference (e.g., 'HEAD^', or a SHA).
- * @returns {string} The file content, or an empty string if not found/error.
- */
 function getFileContentFromCommit(filePath, commitRef) {
   try {
-    // `git show` retrieves the content of a file at a specific commit
     return execSync(`git show ${commitRef}:${filePath}`, {
       encoding: "utf8",
       stdio: ["pipe", "pipe", "ignore"],
     }).toString();
   } catch (error) {
-    // If the file didn't exist in the previous commit, or other error, return empty string
-    // console.warn(`Warning: Could not get content of '${filePath}' from commit '${commitRef}'. It might be a new file or path issue. Error: ${error.message.trim()}`);
     return "";
   }
 }
 
 /**
- * Recursively finds changed string values between two YAML objects.
+ * Recursively finds changed string values between two YAML objects (additions/modifications).
  * Returns an object with dot-separated keys and their new string values.
- * @param {object} currentObj - The current parsed YAML object.
- * @param {object} previousObj - The previous parsed YAML object.
- * @param {object} [changes={}] - Accumulator for changes.
- * @param {string} [prefix=''] - Current dot-separated path prefix.
- * @returns {object} Object containing only the changed string key-value pairs.
  */
 function getChangedStrings(currentObj, previousObj, changes = {}, prefix = "") {
   for (const key in currentObj) {
     if (Object.prototype.hasOwnProperty.call(currentObj, key)) {
       const currentVal = currentObj[key];
-      const previousVal = previousObj ? previousObj[key] : undefined; // Ensure previousVal is defined if previousObj exists
+      const previousVal = previousObj ? previousObj[key] : undefined;
       const fullKey = prefix ? `${prefix}.${key}` : key;
 
       if (typeof currentVal === "string") {
-        // Only consider actual string value changes or new strings
         if (currentVal !== previousVal) {
           changes[fullKey] = currentVal;
         }
@@ -73,26 +53,49 @@ function getChangedStrings(currentObj, previousObj, changes = {}, prefix = "") {
         currentVal !== null &&
         !Array.isArray(currentVal)
       ) {
-        // If it's a nested object (and not an array), recurse
         getChangedStrings(currentVal, previousVal, changes, fullKey);
       }
-      // If a key was removed from the previous, or if arrays are involved,
-      // this simple diff won't capture that. More complex diffing logic
-      // would be needed for array element changes or key deletions.
     }
   }
   return changes;
 }
 
 /**
- * Translates a single string using Google GenAI.
- * @param {string} text - The text to translate.
- * @param {string} targetLanguage - The target language (e.g., 'French').
- * @returns {Promise<string>} The translated text or an error indicator.
+ * Recursively removes keys from targetObj if they are missing in sourceObj.
+ * @param {object} targetObj - The object to modify (e.g., existing French translations).
+ * @param {object} sourceObj - The reference object (e.g., current English strings).
+ * @returns {boolean} True if any keys were deleted, false otherwise.
  */
+function removeDeletedKeys(targetObj, sourceObj) {
+  let hasDeleted = false;
+  for (const key in targetObj) {
+    if (Object.prototype.hasOwnProperty.call(targetObj, key)) {
+      if (!Object.prototype.hasOwnProperty.call(sourceObj, key)) {
+        // Key exists in target but not in source: delete it
+        console.log(`Deleting key '${key}' from target translations.`);
+        delete targetObj[key];
+        hasDeleted = true;
+      } else if (
+        typeof targetObj[key] === "object" &&
+        targetObj[key] !== null &&
+        !Array.isArray(targetObj[key]) &&
+        typeof sourceObj[key] === "object" &&
+        sourceObj[key] !== null &&
+        !Array.isArray(sourceObj[key])
+      ) {
+        // Recurse for nested objects
+        if (removeDeletedKeys(targetObj[key], sourceObj[key])) {
+          hasDeleted = true;
+        }
+      }
+    }
+  }
+  return hasDeleted;
+}
+
 async function translateString(text, targetLanguage) {
   if (text.trim() === "") {
-    return text; // Don't translate empty strings
+    return text;
   }
   try {
     console.log(`Translating (GenAI): "${text}"`);
@@ -101,7 +104,7 @@ async function translateString(text, targetLanguage) {
       contents: prompt,
       model: "gemini-2.5-flash",
     });
-    const translatedText = result.text; // As per your working code
+    const translatedText = result.text;
     console.log(`Translated "${text}" to "${translatedText}"`);
     return translatedText.trim();
   } catch (error) {
@@ -119,17 +122,10 @@ async function translateString(text, targetLanguage) {
     } else if (error.message) {
       console.error("Error message:", error.message);
     }
-    return `[Translation Error with GenAI] ${text}`; // Indicate error
+    return `[Translation Error with GenAI] ${text}`;
   }
 }
 
-/**
- * Recursively sets a value in an object based on a dot-separated key.
- * Creates intermediate objects if they don't exist.
- * @param {object} obj - The object to modify.
- * @param {string} path - Dot-separated path (e.g., 'app.title').
- * @param {*} value - The value to set.
- */
 function setDeep(obj, path, value) {
   const parts = path.split(".");
   let current = obj;
@@ -140,7 +136,7 @@ function setDeep(obj, path, value) {
       typeof current[part] !== "object" ||
       Array.isArray(current[part])
     ) {
-      current[part] = {}; // Initialize as an empty object if not already a plain object
+      current[part] = {};
     }
     current = current[part];
   }
@@ -154,10 +150,7 @@ async function main() {
     const currentSourceContent = fs.readFileSync(sourceYamlPath, "utf8");
     const currentEnglishStrings = yaml.load(currentSourceContent);
 
-    // Get content from the previous commit (using GITHUB_SHA_BEFORE)
     const previousCommitSha = process.env.GITHUB_SHA_BEFORE;
-    // For the very first commit, github.event.before is '0000000000000000000000000000000000000000'
-    // In such cases, previousSourceContent will be empty, and previousEnglishStrings will be {}
     console.log(
       `Fetching previous source file content from commit: ${previousCommitSha || "initial commit (no previous SHA)"}`,
     );
@@ -169,28 +162,7 @@ async function main() {
       ? yaml.load(previousSourceContent)
       : {};
 
-    // 2. Identify changed strings
-    console.log("Identifying changed strings...");
-    const stringsToTranslate = getChangedStrings(
-      currentEnglishStrings,
-      previousEnglishStrings,
-    );
-    const changedKeys = Object.keys(stringsToTranslate);
-
-    if (changedKeys.length === 0) {
-      console.log(
-        "No new or modified strings found in src/global.yaml. No translation needed.",
-      );
-      // Signal to the next step (Create PR) that no changes were made.
-      // This can be done by not modifying the target file, or by creating a flag.
-      // For create-pull-request action, if add-paths finds no changes, it won't create a PR.
-      process.exit(0); // Exit successfully
-    }
-
-    console.log(`Found ${changedKeys.length} strings to translate.`);
-    console.log("Keys to translate:", changedKeys.join(", ")); // Log only the keys for brevity in common cases
-
-    // 3. Load existing target file (French) or initialize if not exists
+    // 2. Load existing target file (French) or initialize if not exists
     let existingFrenchStrings = {};
     if (fs.existsSync(targetYamlPath)) {
       console.log(`Loading existing target file: ${targetYamlPath}`);
@@ -202,46 +174,80 @@ async function main() {
       );
     }
 
-    // 4. Translate only the changed strings and merge into existing French strings
-    const finalFrenchStrings = { ...existingFrenchStrings }; // Start with existing translations
-    let hasActualChanges = false; // Flag to check if translation results in file change
+    // Clone existingFrenchStrings to modify (important to avoid modifying original reference if used elsewhere)
+    const finalFrenchStrings = JSON.parse(
+      JSON.stringify(existingFrenchStrings),
+    ); // Simple deep clone
 
-    for (const key of changedKeys) {
-      const englishText = stringsToTranslate[key];
-      const translatedText = await translateString(englishText, "French");
+    let hasActualChanges = false; // Flag to check if any final content change occurred
 
-      // Check if the translated text is actually different from what's currently there (if it exists)
-      // This is important because GenAI might return same text if input is already French or very simple.
-      let currentTranslatedValue;
-      try {
-        currentTranslatedValue = key
-          .split(".")
-          .reduce((o, i) => o[i], existingFrenchStrings);
-      } catch (e) {
-        currentTranslatedValue = undefined; // Path might not exist in existing structure
-      }
+    // --- Handle Deleted Keys First ---
+    console.log("Checking for deleted keys...");
+    if (removeDeletedKeys(finalFrenchStrings, currentEnglishStrings)) {
+      hasActualChanges = true;
+    }
 
-      if (translatedText !== currentTranslatedValue) {
-        setDeep(finalFrenchStrings, key, translatedText);
-        hasActualChanges = true;
-        console.log(`Updated translation for key "${key}"`);
-      } else {
-        console.log(
-          `No change in translated text for key "${key}", skipping update.`,
-        );
+    // --- Handle Added/Modified Keys ---
+    console.log("Identifying added/modified strings...");
+    const stringsToTranslate = getChangedStrings(
+      currentEnglishStrings,
+      previousEnglishStrings,
+    );
+    const changedKeys = Object.keys(stringsToTranslate);
+
+    if (changedKeys.length === 0 && !hasActualChanges) {
+      // No changes AND no deletions
+      console.log(
+        "No new, modified, or deleted strings found in src/global.yaml. No translation or file update needed.",
+      );
+      process.exit(0); // Exit successfully
+    }
+
+    if (changedKeys.length > 0) {
+      console.log(`Found ${changedKeys.length} strings to translate/update.`);
+      console.log("Keys to translate:", changedKeys.join(", "));
+
+      for (const key of changedKeys) {
+        const englishText = stringsToTranslate[key];
+        const translatedText = await translateString(englishText, "French");
+
+        // Retrieve current value from the working 'finalFrenchStrings'
+        let currentTranslatedValue;
+        try {
+          // Traverse the object to get the value at the specific path
+          currentTranslatedValue = key
+            .split(".")
+            .reduce((o, i) => o && o[i], finalFrenchStrings);
+        } catch (e) {
+          currentTranslatedValue = undefined; // Path might not exist in existing structure
+        }
+
+        if (translatedText !== currentTranslatedValue) {
+          setDeep(finalFrenchStrings, key, translatedText);
+          hasActualChanges = true;
+          console.log(`Updated translation for key "${key}"`);
+        } else {
+          console.log(
+            `No change in translated text for key "${key}", skipping update.`,
+          );
+        }
       }
     }
 
     if (!hasActualChanges) {
       console.log(
-        "No actual translated content changes were detected after processing. No file write needed.",
+        "No actual content changes (additions, modifications, or deletions) were detected after processing. No file write needed.",
       );
       process.exit(0); // Exit successfully, no file changes.
     }
 
     // 5. Dump the final French content back into YAML format
     console.log("Dumping final French content to YAML...");
-    const dumpedYaml = yaml.dump(finalFrenchStrings, { indent: 2 });
+    const dumpedYaml = yaml.dump(finalFrenchStrings, {
+      lineWidth: -1,
+      quotingType: '"',
+      forceQuotes: true,
+    });
 
     // 6. Ensure the target directory exists
     const targetDirectory = path.dirname(targetYamlPath);
