@@ -1,0 +1,13 @@
+components:
+  services:
+    rubric:
+      template:
+        criteria: "Criterio {idx_LOCALIZED}"
+        column1: "Excelente"
+        column2: "Satisfactorio"
+        column3: "Insatisfactorio"
+        column4: "Pobre"
+      newCriteriaHeading: "Nuevo Criterio"
+      newColumnHeading: "Nuevo Nivel"
+      newCopyTitle: "{rubricTitle} {date} copia"
+      persistError: "Se produjo un error al guardar la rúbrica. Por favor, actualice la página e inténtelo de nuevo más tarde."

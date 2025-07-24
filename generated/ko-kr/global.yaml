@@ -1,0 +1,13 @@
+components:
+  services:
+    rubric:
+      template:
+        criteria: "기준 {idx_LOCALIZED}"
+        column1: "훌륭합니다"
+        column2: "만족스러운"
+        column3: "미흡한"
+        column4: "가난한"
+      newCriteriaHeading: "신 기준"
+      newColumnHeading: "새로운 레벨"
+      newCopyTitle: "{rubricTitle} {date} 사본"
+      persistError: "루브릭 저장 중 오류가 발생했습니다. 페이지를 새로고침하고 나중에 다시 시도해 주세요."
