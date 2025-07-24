@@ -11,3 +11,4 @@ components:
       newColumnHeading: "Nuevo Nivel"
       newCopyTitle: "{rubricTitle} {date} copia"
       persistError: "Ha ocurrido un error al guardar la {rubric}. Por favor, actualice la página e inténtelo de nuevo más tarde."
+      persistSuccess: "Rúbrica persistida con éxito."
