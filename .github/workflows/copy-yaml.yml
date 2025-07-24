@@ -1,4 +1,4 @@
-name: Translate Global YAML to French
+name: Translate Changed Global YAML to French (Incremental)
 
 on:
   push:
@@ -11,16 +11,17 @@ jobs:
   translate-file:
     runs-on: ubuntu-latest
     permissions:
-      contents: write # Essential for actions/checkout and peter-evans/create-pull-request
-      pull-requests: write # Essential for creating the pull request
+      contents: write
+      pull-requests: write
 
     steps:
-      - name: Checkout repository
+      - name: Checkout repository with history
         uses: actions/checkout@v4
-        # We don't need fetch-depth here if the Node.js script is back to
-        # full translation, but keep it if you eventually re-enable the diffing logic.
-        # with:
-        #   fetch-depth: 2
+        with:
+          # Fetch the current commit and its immediate parent for comparison
+          # fetch-depth: 2 is usually enough to get the previous commit.
+          # fetch-depth: 0 would get full history, but is slower.
+          fetch-depth: 2
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -30,35 +31,35 @@ jobs:
       - name: Install dependencies
         run: npm install js-yaml @google/genai
 
-      - name: Run Node.js script to translate YAML
+      - name: Run Node.js script to translate ONLY changed YAML strings
         run: node .github/scripts/copy_yaml.js # Your script file name
         env:
           SOURCE_YAML_PATH: src/global.yaml
           TARGET_YAML_PATH: generated/global.yaml
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          # Pass the SHA of the commit BEFORE the current push
+          # This is crucial for `git show` to get the previous version of the file
+          GITHUB_SHA_BEFORE: ${{ github.event.before }}
 
       - name: Create Pull Request
-        id: cpr # Give it an ID to access outputs like PR number/URL
-        uses: peter-evans/create-pull-request@v6 # Use the latest stable version. Check marketplace for v7
+        id: cpr
+        uses: peter-evans/create-pull-request@v6
         with:
-          token: ${{ secrets.PAT_FOR_PR }} # The default GITHUB_TOKEN is usually sufficient
-          commit-message: "feat: Auto-translate generated/global.yaml to French"
-          branch: feature/auto-translate
-          # Alternative branch name if you want it updated: branch: auto-translate/french-localization
-          delete-branch: true # Recommended: Deletes the branch after PR is merged or closed
+          token: ${{ secrets.PAT_FOR_PRS }}
+          commit-message: "feat: Auto-translate updated strings in generated/global.yaml" # Updated commit message
+          branch: auto-translate/french-localization # Using a fixed branch name for continuous updates to the same PR
+          delete-branch: true
           title: "🤖 Auto-translate: Update French Localization"
           body: |
             This Pull Request automatically updates `generated/global.yaml` with French translations
-            based on changes detected in `src/global.yaml`.
+            based on **only the changed strings** detected in `src/global.yaml`.
 
             Triggered by commit: ${{ github.sha }}
             By: @${{ github.actor }}
             
             Please review and merge if translations are correct.
           labels: automated, localization, feature
-          add-paths: 'generated/global.yaml' # Specify the file(s) to include in the PR commit
-          # Optional: reviewers: your-github-username-here
-          # Optional: team-reviewers: your-github-team-name-here
+          add-paths: 'generated/global.yaml'
 
       - name: Check Pull Request Output
         if: steps.cpr.outputs.pull-request-number
