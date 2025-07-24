@@ -41,7 +41,7 @@ jobs:
         id: cpr # Give it an ID to access outputs like PR number/URL
         uses: peter-evans/create-pull-request@v6 # Use the latest stable version. Check marketplace for v7
         with:
-          token: ${{ secrets.GITHUB_TOKEN }} # The default GITHUB_TOKEN is usually sufficient
+          token: ${{ secrets.PAT_FOR_PR }} # The default GITHUB_TOKEN is usually sufficient
           commit-message: "feat: Auto-translate generated/global.yaml to French"
           branch: feature/auto-translate
           # Alternative branch name if you want it updated: branch: auto-translate/french-localization
