@@ -1,0 +1,13 @@
+components:
+  services:
+    rubric:
+      template:
+        criteria: "基準 {idx_LOCALIZED}"
+        column1: "素晴らしい"
+        column2: "良好"
+        column3: "不満足"
+        column4: "貧しい"
+      newCriteriaHeading: "ニュー・クリテリオン"
+      newColumnHeading: "新レベル"
+      newCopyTitle: "{rubricTitle}{date} コピー"
+      persistError: "ルーブリックの保存中にエラーが発生しました。ページを更新し、時間を置いてからもう一度お試しください。"

@@ -1,0 +1,13 @@
+components:
+  services:
+    rubric:
+      template:
+        criteria: "معيار {idx_LOCALIZED}"
+        column1: "ممتاز"
+        column2: "مقبول"
+        column3: "غير مُرضٍ"
+        column4: "فقير"
+      newCriteriaHeading: "معيار جديد"
+      newColumnHeading: "مستوى جديد"
+      newCopyTitle: "{rubricTitle} {date} نسخة"
+      persistError: "حدث خطأ أثناء حفظ نموذج التقييم. الرجاء تحديث الصفحة والمحاولة مرة أخرى لاحقاً."
