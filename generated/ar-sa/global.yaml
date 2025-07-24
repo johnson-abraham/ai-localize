@@ -10,4 +10,4 @@ components:
       newCriteriaHeading: "معيار جديد"
       newColumnHeading: "مستوى جديد"
       newCopyTitle: "{rubricTitle} {date} نسخة"
-      persistError: "حدث خطأ أثناء حفظ نموذج التقييم. الرجاء تحديث الصفحة والمحاولة مرة أخرى لاحقاً."
+      persistError: "حدث خطأ أثناء حفظ نموذج التقييم. يرجى تحديث الصفحة والمحاولة مرة أخرى."
