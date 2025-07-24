@@ -10,4 +10,4 @@ components:
       newCriteriaHeading: "Un Nouveau Critère"
       newColumnHeading: "Nouveau niveau"
       newCopyTitle: "{rubricTitle} {date} copie"
-      persistError: "Une erreur est survenue lors de l'enregistrement de la rubrique. Veuillez rafraîchir la page et réessayer."
+      persistError: "Une erreur est survenue lors de l'enregistrement du {rubric}. Veuillez actualiser la page et réessayer plus tard."

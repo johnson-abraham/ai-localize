@@ -1,0 +1,13 @@
+components:
+  services:
+    rubric:
+      template:
+        criteria: "Критерий {idx_LOCALIZED}"
+        column1: "Отлично"
+        column2: "Удовлетворительно"
+        column3: "Неудовлетворительно"
+        column4: "Бедный"
+      newCriteriaHeading: "Новый Критерий"
+      newColumnHeading: "Новый уровень"
+      newCopyTitle: "{rubricTitle} {date} экземпляр"
+      persistError: "Произошла ошибка при сохранении рубрики. Пожалуйста, обновите страницу и попробуйте снова позже."
