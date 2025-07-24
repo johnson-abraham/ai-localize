@@ -25,6 +25,7 @@ const LOCALE_CONFIGS = [
   { folder: "jp-jp", langCode: "ja", name: "Japanese (Japan)" },
   { folder: "ko-kr", langCode: "ko", name: "Korean (Korea)" },
   { folder: "ar-sa", langCode: "ar", name: "Arabic (Saudi Arabia)" },
+  { folder: "ru-ru", langCode: "ru", name: "Russian (Russia)" },
 ];
 
 function getFileContentFromCommit(filePath, commitRef) {
