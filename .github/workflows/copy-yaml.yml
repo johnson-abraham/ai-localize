@@ -3,12 +3,12 @@ name: Translate All Locales (Incremental)
 on:
   push:
     branches:
-      - master # Triggers on push to the 'master' branch
+      - master
     paths:
-      - 'src/global.yaml' # Triggers only if 'src/global.yaml' changes
+      - 'src/global.yaml'
 
 jobs:
-  translate-all-locales: # Renamed job for clarity
+  translate-all-locales:
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -18,7 +18,7 @@ jobs:
       - name: Checkout repository with history
         uses: actions/checkout@v4
         with:
-          fetch-depth: 2 # Fetch the current commit and its immediate parent for comparison
+          fetch-depth: 2
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -29,7 +29,7 @@ jobs:
         run: npm install js-yaml @google/genai
 
       - name: Run Node.js script to translate ONLY changed YAML strings for all locales
-        run: node .github/scripts/copy_yaml.js # Your script file name
+        run: node .github/scripts/copy_yaml.js
         env:
           SOURCE_YAML_PATH: src/global.yaml
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
@@ -40,10 +40,10 @@ jobs:
         uses: peter-evans/create-pull-request@v6
         with:
           token: ${{ secrets.PAT_FOR_PR }}
-          commit-message: "feat: Auto-translate updated strings for all locales" # General commit message
-          branch: feature/auto-translate # Fixed, long-lived branch name
-          delete-branch: false # Keeps the branch for continuous updates
-          title: "🤖 Auto-translate: Update All Locale Localizations" # General PR title
+          commit-message: "feat: Auto-translate updated strings for all locales"
+          branch: feature/auto-translate
+          delete-branch: false
+          title: "🤖 Auto-translate: Update All Locale Localizations"
           body: |
             This Pull Request automatically updates `generated/<locale>/global.yaml` files with translations
             based on **only the changed strings** detected in `src/global.yaml`.
@@ -53,8 +53,7 @@ jobs:
             By: @${{ github.actor }}
             
             Please review and merge if translations are correct.
-          labels: automated, localization, feature, multi-locale
-          # --- IMPORTANT CHANGE HERE: Use a wildcard for multiple files ---
+          labels: automated, localization, ai
           add-paths: 'generated/**/*.yaml'
           # -----------------------------------------------------------------
 

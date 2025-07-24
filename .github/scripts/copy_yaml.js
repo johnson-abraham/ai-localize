@@ -130,31 +130,38 @@ async function translateString(text, targetLanguage) {
   }
   try {
     console.log(`Translating (GenAI) to ${targetLanguage}: "${text}"`);
+
     const prompt = `Translate the following English text to ${targetLanguage}. Do not translate the texts within the {}. Only return the translated text:\n\n"${text}"`;
     const result = await ai.models.generateContent({
       contents: prompt,
       model: "gemini-2.5-flash",
     });
+
     const translatedText = result.text;
+
     console.log(`Translated "${text}" to "${translatedText}"`);
+
     return translatedText.trim();
   } catch (error) {
     console.error(
       `ERROR during GenAI translation for text "${text}" to ${targetLanguage}:`,
     );
     console.error(error);
+
     if (error.response) {
       console.error(
         "API Response Error:",
         error.response.status,
         error.response.statusText,
       );
+
       if (error.response.data) {
         console.error("API Response Data:", error.response.data);
       }
     } else if (error.message) {
       console.error("Error message:", error.message);
     }
+
     return `[Translation Error with GenAI to ${targetLanguage}] ${text}`;
   }
 }
@@ -319,6 +326,7 @@ async function main() {
       console.log(
         `[${localeFolder}] Dumping final ${targetLangName} content to YAML...`,
       );
+
       const dumpedYaml = yaml.dump(finalLocaleStrings, {
         lineWidth: -1,
         quotingType: '"',
