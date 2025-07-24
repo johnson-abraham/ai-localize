@@ -11,3 +11,4 @@ components:
       newColumnHeading: "새로운 레벨"
       newCopyTitle: "{rubricTitle} {date} 사본"
       persistError: "루브릭 저장 중 오류가 발생했습니다. 페이지를 새로고침한 후 나중에 다시 시도해 주세요."
+      persistSuccess: "루브릭이 성공적으로 저장되었습니다."

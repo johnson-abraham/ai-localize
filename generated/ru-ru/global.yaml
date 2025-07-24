@@ -11,3 +11,4 @@ components:
       newColumnHeading: "Новый уровень"
       newCopyTitle: "{rubricTitle} {date} экземпляр"
       persistError: "Произошла ошибка при сохранении рубрики. Пожалуйста, обновите страницу и попробуйте снова позже."
+      persistSuccess: "Успешно сохранена рубрика."
