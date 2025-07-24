@@ -10,4 +10,4 @@ components:
       newCriteriaHeading: "Un nuevo criterio"
       newColumnHeading: "Nuevo Nivel"
       newCopyTitle: "{rubricTitle} {date} copia"
-      persistError: "Ha ocurrido un error al guardar la rúbrica. Por favor, actualice la página y vuelva a intentarlo."
+      persistError: "Ha ocurrido un error al guardar la {rubric}. Por favor, actualice la página e inténtelo de nuevo más tarde."

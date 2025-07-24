@@ -10,4 +10,4 @@ components:
       newCriteriaHeading: "새로운 기준"
       newColumnHeading: "새로운 레벨"
       newCopyTitle: "{rubricTitle} {date} 사본"
-      persistError: "루브릭 저장 중 오류가 발생했습니다. 페이지를 새로고침 후 다시 시도해 주세요."
+      persistError: "루브릭 저장 중 오류가 발생했습니다. 페이지를 새로고침한 후 나중에 다시 시도해 주세요."
