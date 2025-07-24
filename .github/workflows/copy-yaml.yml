@@ -45,7 +45,7 @@ jobs:
         id: cpr
         uses: peter-evans/create-pull-request@v6
         with:
-          token: ${{ secrets.PAT_FOR_PRS }}
+          token: ${{ secrets.PAT_FOR_PR }}
           commit-message: "feat: Auto-translate updated strings in generated/global.yaml" # Updated commit message
           branch: auto-translate/french-localization # Using a fixed branch name for continuous updates to the same PR
           delete-branch: true
