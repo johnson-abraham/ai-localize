@@ -12,3 +12,4 @@ components:
       newCopyTitle: "{rubricTitle}{date} コピー"
       persistError: "ルーブリックの保存中にエラーが発生しました。ページを更新して、後でもう一度お試しください。"
       persistSuccess: "ルーブリックの永続化に成功しました。"
+      label: "{studentName} へのフィードバックを提供するリッチテキストエディタを開きます。"
