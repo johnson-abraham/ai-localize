@@ -11,5 +11,5 @@ components:
       newColumnHeading: "مستوى جديد"
       newCopyTitle: "{rubricTitle} {date} نسخة"
       persistError: "حدث خطأ أثناء حفظ قالب التقييم. يرجى تحديث الصفحة والمحاولة مرة أخرى لاحقًا."
-      persistSuccess: "تم حفظ نموذج التقييم بنجاح."
+      persistSuccess: "تم حفظ المنهجية بنجاح."
       label: "افتح محرر النص المنسق لتقديم ملاحظات لـ {studentName}"
