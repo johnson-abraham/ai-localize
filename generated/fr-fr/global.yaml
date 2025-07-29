@@ -12,4 +12,4 @@ components:
       newCopyTitle: "{rubricTitle} {date} copie"
       persistError: "Une erreur est survenue lors de l'enregistrement du {rubric}. Veuillez actualiser la page et réessayer plus tard."
       persistSuccess: "Rubrique persistée avec succès."
-      label: "Ouvrir l'éditeur de texte enrichi pour fournir un retour à {studentName}"
+      label: "Ouvrez l'éditeur de texte pour fournir un retour à {studentName}"
