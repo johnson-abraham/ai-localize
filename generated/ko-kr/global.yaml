@@ -12,4 +12,4 @@ components:
       newCopyTitle: "{rubricTitle} {date} 사본"
       persistError: "루브릭 저장 중 오류가 발생했습니다. 페이지를 새로고침한 후 나중에 다시 시도해 주세요."
       persistSuccess: "berhasil membuat rubriknya."
-      label: "{studentName}님께 피드백을 제공하기 위해 서식 있는 텍스트 편집기를 엽니다."
+      label: "{studentName}에 대한 피드백을 제공하기 위해 텍스트 편집기를 엽니다."
