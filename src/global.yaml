@@ -12,4 +12,4 @@ components:
       newCopyTitle: "{rubricTitle} {date} copy"
       persistError: "Error occurred while saving the rubric. Please refresh the page and try again later."
       persistSuccess: "Successfully persisted the rubric."
-      label: "Kindly open the text editor to provide feedback for {studentName}"
+      label: "Open the text editor to provide feedback for {studentName}"
