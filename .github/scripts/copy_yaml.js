@@ -190,7 +190,7 @@ async function main() {
     const currentSourceContent = fs.readFileSync(sourceYamlPath, "utf8");
     const currentEnglishStrings = yaml.load(currentSourceContent);
 
-    const targetBranch = process.env.GITHUB_BASE_REF || "main";
+    const targetBranch = process.env.GITHUB_BASE_REF || "master";
     console.log(`Target branch for comparison is: ${targetBranch}`);
 
     const previousCommitSha = execSync(`git merge-base HEAD ${targetBranch}`).toString().trim();
