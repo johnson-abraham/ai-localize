@@ -26,8 +26,67 @@ const LOCALE_CONFIGS = [
   { folder: "ko-kr", langCode: "ko", name: "Korean (Korea)" },
   { folder: "ar-sa", langCode: "ar", name: "Arabic (Saudi Arabia)" },
   { folder: "ru-ru", langCode: "ru", name: "Russian (Russia)" },
-  { folder: 'pl-pl', langCode: 'pl', name: 'Polish (Poland)' },
+  { folder: "pl-pl", langCode: "pl", name: "Polish (Poland)" },
 ];
+
+/**
+ * Finds the correct "previous" commit SHA for a master-push workflow.
+ * It looks for an open PR with a specific label and reads a "watermark"
+ * from its body to find the last-processed source commit.
+ * @returns {string} The commit SHA to compare against.
+ */
+function getPreviousCommitForMasterWorkflow() {
+  const prLabel = "i18n-autotranslate"; // A unique label for our PRs
+  const watermarkPrefix = "<!-- i18n-source-commit:";
+  const watermarkSuffix = "-->";
+
+  try {
+    // Use 'gh' CLI to find the open PR with our label
+    console.log(`Searching for an open PR with label "${prLabel}"...`);
+    const prDataJson = execSync(
+      `gh pr list --state open --label "${prLabel}" --json number,body --limit 1`,
+      { encoding: "utf8", stdio: ["pipe", "pipe", "ignore"] },
+    ).toString();
+
+    const prData = JSON.parse(prDataJson);
+
+    if (prData && prData.length > 0) {
+      const prBody = prData[0].body;
+      const number = prData[0].number;
+      console.log(
+        `Found open translation PR #${number}. Reading body for watermark...`,
+      );
+
+      const startIndex = prBody.indexOf(watermarkPrefix);
+      const endIndex = prBody.indexOf(watermarkSuffix, startIndex);
+
+      if (startIndex !== -1 && endIndex !== -1) {
+        const sha = prBody
+          .substring(startIndex + watermarkPrefix.length, endIndex)
+          .trim();
+        if (sha) {
+          console.log(`Found source commit watermark: ${sha}`);
+          return sha;
+        }
+      }
+      console.warn(
+        `WARN: Found PR #${number} but it did not contain a valid watermark. This should not happen.`,
+      );
+    } else {
+      console.log("No open translation PR found.");
+    }
+  } catch (error) {
+    console.log(
+      "Could not find an open translation PR. This may be the first run.",
+    );
+    // This can happen if 'gh' fails, no PR exists, etc. It's not a fatal error.
+  }
+
+  // FALLBACK: If no PR is found or it has no watermark, use the previous commit on master.
+  const fallbackSha = process.env.GITHUB_SHA_BEFORE;
+  console.log(`Using fallback 'previous' commit: ${fallbackSha}`);
+  return fallbackSha;
+}
 
 function getFileContentFromCommit(filePath, commitRef) {
   try {
@@ -193,7 +252,13 @@ async function main() {
     const targetBranch = process.env.GITHUB_BASE_REF || "master";
     console.log(`Target branch for comparison is: ${targetBranch}`);
 
-    const previousCommitSha = execSync(`git merge-base HEAD ${targetBranch}`).toString().trim();
+    const previousCommitSha = getPreviousCommitForMasterWorkflow();
+    if (!previousCommitSha) {
+      console.log(
+        "No previous commit could be determined. Assuming this is the very first commit and exiting.",
+      );
+      process.exit(0);
+    }
     console.log(
       `Fetching previous source file content from commit: ${previousCommitSha || "initial commit (no previous SHA)"}`,
     );

@@ -5,7 +5,7 @@ on:
     branches:
       - master
     paths:
-      - 'src/global.yaml'
+      - "src/global.yaml"
 
 jobs:
   translate-all-locales:
@@ -15,47 +15,48 @@ jobs:
       pull-requests: write
 
     steps:
-      - name: Checkout repository with history
+      - name: Checkout repository with full history
         uses: actions/checkout@v4
         with:
-          fetch-depth: 2
+          fetch-depth: 0
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: "20"
 
       - name: Install dependencies
         run: npm install js-yaml @google/genai
 
-      - name: Run Node.js script to translate ONLY changed YAML strings for all locales
+      - name: Run Node.js script to translate ONLY changed YAML strings
         run: node .github/scripts/copy_yaml.js
         env:
           SOURCE_YAML_PATH: src/global.yaml
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           GITHUB_SHA_BEFORE: ${{ github.event.before }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Create Pull Request for all locale changes
+      - name: Create or Update Pull Request for all locale changes
         id: cpr
         uses: peter-evans/create-pull-request@v6
         with:
           token: ${{ secrets.PAT_FOR_PR }}
-          commit-message: "feat: Auto-translate updated strings for all locales"
+          commit-message: "feat(i18n): Auto-translate updated strings for all locales"
           branch: feature/auto-translate
           delete-branch: false
           title: "🤖 Auto-translate: Update All Locale Localizations"
           body: |
             This Pull Request automatically updates `generated/<locale>/global.yaml` files with translations
-            based on **only the changed strings** detected in `src/global.yaml`.
+            based on changes detected in `src/global.yaml` on the `master` branch.
 
-            Locales updated: es-es, fr-fr, jp-jp, ko-kr, ar-sa
             Triggered by commit: ${{ github.sha }}
             By: @${{ github.actor }}
-            
+
             Please review and merge if translations are correct.
+
+            <!-- i18n-source-commit: ${{ github.sha }} -->
           labels: automated, localization, ai
-          add-paths: 'generated/**/*.yaml'
-          # -----------------------------------------------------------------
+          add-paths: "generated/**/*.yaml"
 
       - name: Check Pull Request Output
         if: steps.cpr.outputs.pull-request-number
