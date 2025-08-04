@@ -95,8 +95,8 @@ async function translateString(text, targetLanguageName) {
       contents: prompt,
       model: "gemini-2.5-flash-lite",
     });
-    const response = await result.text;
-    const translatedText = response.text().trim();
+
+    const translatedText = result.text.trim()
 
     console.log(`   -> Translated to: "${translatedText}"`);
     return translatedText;
