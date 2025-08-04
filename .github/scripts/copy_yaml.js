@@ -91,7 +91,7 @@ async function translateString(text, targetLanguageName) {
     console.log(`   Translating to ${targetLanguageName}: "${text}"`);
     const prompt = `Translate the following English text to ${targetLanguageName}. Only return the translated text. Do not add quotes around the translation. Do not translate placeholders like {placeholder}. Text: "${text}"`;
 
-    const result = await ai.model.generateContent({
+    const result = await ai.models.generateContent({
       contents: prompt,
       model: "gemini-2.5-flash-lite",
     });
