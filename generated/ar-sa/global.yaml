@@ -12,4 +12,4 @@ components:
       newCopyTitle: "{rubricTitle} {date} نسخة"
       persistError: "حدث خطأ أثناء حفظ قالب التقييم. يرجى تحديث الصفحة والمحاولة مرة أخرى لاحقًا."
       persistSuccess: "تم حفظ المنهجية بنجاح."
-      label: "افتح محرر النصوص لتقديم ملاحظات لـ {studentName}"
+      label: "افتح محرر النصوص لتقديم ملاحظات للطالب {studentName}"

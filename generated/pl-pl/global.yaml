@@ -12,4 +12,4 @@ components:
       newCopyTitle: "\"{rubricTitle} {date} kopia\""
       persistError: "Wystąpił błąd podczas zapisywania kryteriów oceniania. Odśwież stronę i spróbuj ponownie później."
       persistSuccess: "Pomyślnie zachowano rubricę."
-      label: "Otwórz edytor tekstu, aby przekazać opinie dla {studentName}"
+      label: "Otwórz edytor tekstu, aby przekazać opinię dla {studentName}"
