@@ -55,7 +55,7 @@ jobs:
             Please review and merge if translations are correct.
 
             <!-- i18n-source-commit: ${{ github.sha }} -->
-          labels: automated, localization, ai
+          labels: automated, ai, i18n-autotranslate
           add-paths: "generated/**/*.yaml"
 
       - name: Check Pull Request Output
