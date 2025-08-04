@@ -14,3 +14,4 @@ components:
       persistSuccess: "Successfully persisted the rubric."
       label: "Open the text editor to provide feedback for {studentName}"
       text: "Hello World"
+      new: "Hello"
