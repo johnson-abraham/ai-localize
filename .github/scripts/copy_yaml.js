@@ -15,7 +15,7 @@ if (!sourceYamlPath || !geminiApiKey || !previousCommitSha) {
   process.exit(1);
 }
 
-const ai = new GoogleGenAI({});
+const ai = new GoogleGenAI({ apiKey: geminiApiKey });
 
 const LOCALE_CONFIGS = [
     { folder: "es-es", langCode: "es", name: "Spanish (Spain)" },
