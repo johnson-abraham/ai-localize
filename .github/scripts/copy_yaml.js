@@ -190,7 +190,10 @@ async function main() {
     const currentSourceContent = fs.readFileSync(sourceYamlPath, "utf8");
     const currentEnglishStrings = yaml.load(currentSourceContent);
 
-    const previousCommitSha = process.env.GITHUB_SHA_BEFORE;
+    const targetBranch = process.env.GITHUB_BASE_REF || "main";
+    console.log(`Target branch for comparison is: ${targetBranch}`);
+
+    const previousCommitSha = execSync(`git merge-base HEAD ${targetBranch}`).toString().trim();
     console.log(
       `Fetching previous source file content from commit: ${previousCommitSha || "initial commit (no previous SHA)"}`,
     );
