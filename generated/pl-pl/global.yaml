@@ -12,5 +12,4 @@ components:
       newCopyTitle: "{rubricTitle} {date} kopia"
       persistError: "Wystąpił błąd podczas zapisywania rubryki. Odśwież stronę i spróbuj ponownie później."
       persistSuccess: "Pomyślnie zapisano rubrykę."
-      label: "Uprzejmie otwórz edytor tekstu, aby przekazać opinię dla {studentName}"
-      text: "Witajcie Światy"
+      label: "Otwórz edytor tekstu, aby przekazać opinię dla {studentName}"

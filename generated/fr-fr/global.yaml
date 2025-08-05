@@ -12,5 +12,4 @@ components:
       newCopyTitle: "\"{rubricTitle} {date} copie\""
       persistError: "Une erreur s'est produite lors de l'enregistrement de la grille d'évaluation. Veuillez rafraîchir la page et réessayer plus tard."
       persistSuccess: "Rubrique persistée avec succès."
-      label: "Veuillez ouvrir l'éditeur de texte pour fournir des commentaires pour {studentName}"
-      text: "Bonjour le monde"
+      label: "Ouvrez l'éditeur de texte pour fournir un commentaire pour {studentName}"
