@@ -2,15 +2,15 @@ components:
   services:
     rubric:
       template:
-        criteria: "معيار {idx_LOCALIZED}"
+        criteria: "المعيار {idx_LOCALIZED}"
         column1: "ممتاز"
-        column2: "مُرضي"
-        column3: "غير مرضٍ"
+        column2: "مرضي"
+        column3: "غير مُرضٍ"
         column4: "فقير"
       newCriteriaHeading: "معيار جديد"
       newColumnHeading: "مستوى جديد"
       newCopyTitle: "{rubricTitle} {date} نسخة"
-      persistError: "حدث خطأ أثناء حفظ المعايير. يرجى تحديث الصفحة والمحاولة لاحقًا."
-      persistSuccess: "تم حفظ النموذج بنجاح."
-      label: "افتح محرر النصوص لتقديم ملاحظات لـ {studentName}"
-      text: "مرحباً بالعالم"
+      persistError: "حدث خطأ أثناء حفظ نموذج التقييم. يرجى تحديث الصفحة والمحاولة مرة أخرى لاحقًا."
+      persistSuccess: "تم حفظ معايير التقييم بنجاح."
+      label: "تفضل بفتح محرر النصوص لتقديم ملاحظات لـ {studentName}"
+      text: "أهلاً بالعالمين"
