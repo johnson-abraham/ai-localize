@@ -13,4 +13,4 @@ components:
       persistError: "Se ha producido un error al guardar la rúbrica. Por favor, actualiza la página e inténtalo de nuevo más tarde."
       persistSuccess: "Rúbrica guardada correctamente."
       label: "Por favor, abre el editor de texto para dar tu opinión sobre {studentName}"
-      text: "Hola Mundo"
+      text: "Hola"

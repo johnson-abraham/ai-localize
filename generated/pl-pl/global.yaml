@@ -1,0 +1,16 @@
+components:
+  services:
+    rubric:
+      template:
+        criteria: "Kryterium {idx_LOCALIZED}"
+        column1: "Wyśmienicie"
+        column2: "Zadowalający"
+        column3: "Niezadowalający"
+        column4: "Biedny"
+      newCriteriaHeading: "Nowe kryterium"
+      newColumnHeading: "Nowy Poziom"
+      newCopyTitle: "{rubricTitle} {date} kopia"
+      persistError: "Wystąpił błąd podczas zapisywania schematu oceny. Odśwież stronę i spróbuj ponownie później."
+      persistSuccess: "Pomyślnie utrwalono rubrykę."
+      label: "Proszę otworzyć edytor tekstu, aby przesłać opinię dla {studentName}"
+      text: "Cześć"
