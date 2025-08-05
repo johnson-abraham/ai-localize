@@ -15,10 +15,11 @@ jobs:
       pull-requests: write
 
     steps:
-      - name: Checkout repository with history
+      - name: Checkout repository with full history
         uses: actions/checkout@v4
         with:
-          fetch-depth: 2
+          # Fetch all history to ensure 'git show' can find the commit from translation_state.json
+          fetch-depth: 0
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -26,36 +27,44 @@ jobs:
           node-version: '20'
 
       - name: Install dependencies
+        # It's better practice to use a package.json, but this works.
         run: npm install js-yaml @google/genai
 
-      - name: Run Node.js script to translate ONLY changed YAML strings for all locales
+      - name: Run translation script
+        # The script is now named 'translate.js' in my examples, update if you kept the old name
         run: node .github/scripts/copy_yaml.js
         env:
           SOURCE_YAML_PATH: src/global.yaml
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-          GITHUB_SHA_BEFORE: ${{ github.event.before }}
+          # The script now needs the CURRENT SHA to save to the state file
+          GITHUB_SHA: ${{ github.sha }}
 
-      - name: Create Pull Request for all locale changes
+      - name: Create Pull Request with all changes
         id: cpr
         uses: peter-evans/create-pull-request@v6
         with:
-          token: ${{ secrets.PAT_FOR_PR }}
+          token: ${{ secrets.PAT_FOR_PR || secrets.GITHUB_TOKEN }}
           commit-message: "feat: Auto-translate updated strings for all locales"
           branch: feature/auto-translate
-          delete-branch: false
+          delete-branch: true # Usually better to clean up the branch after merge
           title: "🤖 Auto-translate: Update All Locale Localizations"
           body: |
-            This Pull Request automatically updates `generated/<locale>/global.yaml` files with translations
-            based on **only the changed strings** detected in `src/global.yaml`.
+            This Pull Request automatically updates localization files based on changes in `src/global.yaml`.
 
-            Locales updated: es-es, fr-fr, jp-jp, ko-kr, ar-sa
+            - Updated `generated/` translation files.
+            - Updated `translation_state.json` to track the latest processed commit.
+
             Triggered by commit: ${{ github.sha }}
             By: @${{ github.actor }}
             
-            Please review and merge if translations are correct.
-          labels: automated, localization, ai
-          add-paths: 'generated/**/*.yaml'
-          # -----------------------------------------------------------------
+            Please review and merge.
+          labels: automated, localization
+
+          # --- THIS IS THE FIX ---
+          # Add both the generated files AND the state file to the commit.
+          add-paths: |
+            generated/
+            translation_state.json
 
       - name: Check Pull Request Output
         if: steps.cpr.outputs.pull-request-number
