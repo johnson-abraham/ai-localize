@@ -1,24 +1,17 @@
 const fs = require("fs");
 const path = require("path");
-const { execSync } = require("child_process");
 const yaml = require("js-yaml");
 const { GoogleGenAI } = require("@google/genai");
 
-const sourceYamlPath = process.env.SOURCE_YAML_PATH; // src/global.yaml (English)
+// --- CONFIGURATION ---
 
+// Path to the source English YAML file.
+const sourceYamlPath = process.env.SOURCE_YAML_PATH; // e.g., 'src/global.yaml'
+
+// Your Gemini API Key from environment variables.
 const geminiApiKey = process.env.GEMINI_API_KEY;
-if (!geminiApiKey) {
-  console.error("Error: GEMINI_API_KEY environment variable is not set.");
-  process.exit(1);
-}
 
-const ai = new GoogleGenAI({});
-
-if (!sourceYamlPath) {
-  console.error("Error: SOURCE_YAML_PATH environment variable must be set.");
-  process.exit(1);
-}
-
+// The list of locales to translate to.
 const LOCALE_CONFIGS = [
   { folder: "es-es", langCode: "es", name: "Spanish (Spain)" },
   { folder: "fr-fr", langCode: "fr", name: "French (France)" },
@@ -29,49 +22,25 @@ const LOCALE_CONFIGS = [
   { folder: 'pl-pl', langCode: 'pl', name: 'Polish (Poland)' },
 ];
 
-function getFileContentFromCommit(filePath, commitRef) {
-  try {
-    return execSync(`git show ${commitRef}:${filePath}`, {
-      encoding: "utf8",
-      stdio: ["pipe", "pipe", "ignore"],
-    }).toString();
-  } catch (error) {
-    return "";
-  }
+// --- SCRIPT START ---
+
+if (!sourceYamlPath) {
+  console.error("Error: SOURCE_YAML_PATH environment variable must be set.");
+  process.exit(1);
+}
+if (!geminiApiKey) {
+  console.error("Error: GEMINI_API_KEY environment variable is not set.");
+  process.exit(1);
 }
 
-/**
- * Recursively finds changed string values between two YAML objects (additions/modifications).
- * Returns an object with dot-separated keys and their new string values.
- */
-function getChangedStrings(currentObj, previousObj, changes = {}, prefix = "") {
-  for (const key in currentObj) {
-    if (Object.prototype.hasOwnProperty.call(currentObj, key)) {
-      const currentVal = currentObj[key];
-      const previousVal = previousObj ? previousObj[key] : undefined;
-      const fullKey = prefix ? `${prefix}.${key}` : key;
-
-      if (typeof currentVal === "string") {
-        if (currentVal !== previousVal) {
-          changes[fullKey] = currentVal;
-        }
-      } else if (
-        typeof currentVal === "object" &&
-        currentVal !== null &&
-        !Array.isArray(currentVal)
-      ) {
-        getChangedStrings(currentVal, previousVal, changes, fullKey);
-      }
-    }
-  }
-  return changes;
-}
+const ai = new GoogleGenAI({apiKey: geminiApiKey});
 
 /**
- * Recursively extracts all string values from a YAML object.
- * Returns an object with dot-separated keys and their string values.
+ * Recursively extracts all string values from an object.
+ * @param {object} obj The object to parse.
+ * @returns {object} A flat object with dot-separated keys and their string values.
  */
-function getAllStringsFromObject(obj, allStrings = {}, prefix = "") {
+function getAllStrings(obj, allStrings = {}, prefix = "") {
   for (const key in obj) {
     if (Object.prototype.hasOwnProperty.call(obj, key)) {
       const val = obj[key];
@@ -79,12 +48,8 @@ function getAllStringsFromObject(obj, allStrings = {}, prefix = "") {
 
       if (typeof val === "string") {
         allStrings[fullKey] = val;
-      } else if (
-        typeof val === "object" &&
-        val !== null &&
-        !Array.isArray(val)
-      ) {
-        getAllStringsFromObject(val, allStrings, fullKey);
+      } else if (typeof val === "object" && val !== null && !Array.isArray(val)) {
+        getAllStrings(val, allStrings, fullKey);
       }
     }
   }
@@ -92,90 +57,66 @@ function getAllStringsFromObject(obj, allStrings = {}, prefix = "") {
 }
 
 /**
- * Recursively removes keys from targetObj if they are missing in sourceObj.
- * @param {object} targetObj - The object to modify (e.g., existing French translations).
- * @param {object} sourceObj - The reference object (e.g., current English strings).
- * @returns {boolean} True if any keys were deleted, false otherwise.
+ * Recursively removes keys from a target object if they are missing in a source object.
+ * This keeps the translation files in sync with the source English file.
+ * @param {object} targetObj The object to modify (e.g., existing French translations).
+ * @param {object} sourceObj The reference object (e.g., current English strings).
  */
 function removeDeletedKeys(targetObj, sourceObj) {
-  let hasDeleted = false;
   for (const key in targetObj) {
     if (Object.prototype.hasOwnProperty.call(targetObj, key)) {
       if (!Object.prototype.hasOwnProperty.call(sourceObj, key)) {
-        // Key exists in target but not in source: delete it
-        console.log(`Deleting key '${key}' from target translations.`);
+        console.log(`- Deleting obsolete key '${key}' from target translations.`);
         delete targetObj[key];
-        hasDeleted = true;
       } else if (
-        typeof targetObj[key] === "object" &&
-        targetObj[key] !== null &&
-        !Array.isArray(targetObj[key]) &&
-        typeof sourceObj[key] === "object" &&
-        sourceObj[key] !== null &&
-        !Array.isArray(sourceObj[key])
+        typeof targetObj[key] === "object" && targetObj[key] !== null && !Array.isArray(targetObj[key]) &&
+        typeof sourceObj[key] === "object" && sourceObj[key] !== null && !Array.isArray(sourceObj[key])
       ) {
         // Recurse for nested objects
-        if (removeDeletedKeys(targetObj[key], sourceObj[key])) {
-          hasDeleted = true;
-        }
+        removeDeletedKeys(targetObj[key], sourceObj[key]);
       }
     }
   }
-  return hasDeleted;
 }
 
+/**
+ * Translates a single string using the Gemini API.
+ * @param {string} text The English text to translate.
+ * @param {string} targetLanguage The full name of the target language (e.g., "Spanish (Spain)").
+ * @returns {Promise<string>} The translated text.
+ */
 async function translateString(text, targetLanguage) {
-  if (text.trim() === "") {
-    return text;
+  if (!text || text.trim() === "") {
+    return text; // Return empty/whitespace strings as-is
   }
   try {
-    console.log(`Translating (GenAI) to ${targetLanguage}: "${text}"`);
+    console.log(`   Translating to ${targetLanguage}: "${text}"`);
+    const prompt = `Translate the following English text to ${targetLanguage}. Do not translate placeholders inside curly braces like {name} or {count}. Only return the translated text, without any introductory phrases or quotation marks.\n\nEnglish text: "${text}"`;
 
-    const prompt = `Translate the following English text to ${targetLanguage}. Do not translate the texts within the {}. Only return the translated text:\n\n"${text}"`;
     const result = await ai.models.generateContent({
       contents: prompt,
       model: "gemini-2.5-flash-lite",
     });
 
-    const translatedText = result.text;
-
-    console.log(`Translated "${text}" to "${translatedText}"`);
-
-    return translatedText.trim();
+    return result.text;
   } catch (error) {
-    console.error(
-      `ERROR during GenAI translation for text "${text}" to ${targetLanguage}:`,
-    );
-    console.error(error);
-
-    if (error.response) {
-      console.error(
-        "API Response Error:",
-        error.response.status,
-        error.response.statusText,
-      );
-
-      if (error.response.data) {
-        console.error("API Response Data:", error.response.data);
-      }
-    } else if (error.message) {
-      console.error("Error message:", error.message);
-    }
-
-    return `[Translation Error with GenAI to ${targetLanguage}] ${text}`;
+    console.error(`ERROR during GenAI translation for text "${text}" to ${targetLanguage}:`, error);
+    return `[Translation Error] ${text}`;
   }
 }
 
+/**
+ * Sets a value in a nested object using a dot-separated path.
+ * @param {object} obj The object to modify.
+ * @param {string} path The dot-separated path (e.g., "greetings.welcome").
+ * @param {string} value The value to set.
+ */
 function setDeep(obj, path, value) {
   const parts = path.split(".");
   let current = obj;
   for (let i = 0; i < parts.length - 1; i++) {
     const part = parts[i];
-    if (
-      !current[part] ||
-      typeof current[part] !== "object" ||
-      Array.isArray(current[part])
-    ) {
+    if (!current[part] || typeof current[part] !== "object") {
       current[part] = {};
     }
     current = current[part];
@@ -183,188 +124,62 @@ function setDeep(obj, path, value) {
   current[parts[parts.length - 1]] = value;
 }
 
+/**
+ * Main function to run the translation process.
+ */
 async function main() {
   try {
-    // 1. Get current and previous versions of src/global.yaml (Source is common for all locales)
-    console.log(`Reading current source file: ${sourceYamlPath}`);
-    const currentSourceContent = fs.readFileSync(sourceYamlPath, "utf8");
-    const currentEnglishStrings = yaml.load(currentSourceContent);
+    // 1. Load the source English strings from the YAML file.
+    console.log(`Reading source file: ${sourceYamlPath}`);
+    const sourceContent = fs.readFileSync(sourceYamlPath, "utf8");
+    const sourceStringsObject = yaml.load(sourceContent);
+    const sourceStringsFlat = getAllStrings(sourceStringsObject);
 
-    const previousCommitSha = process.env.GITHUB_SHA_BEFORE;
-    console.log(
-      `Fetching previous source file content from commit: ${previousCommitSha || "initial commit (no previous SHA)"}`,
-    );
-    const previousSourceContent = getFileContentFromCommit(
-      sourceYamlPath,
-      previousCommitSha,
-    );
-    const previousEnglishStrings = previousSourceContent
-      ? yaml.load(previousSourceContent)
-      : {};
+    if (Object.keys(sourceStringsFlat).length === 0) {
+        console.log("Source file is empty or contains no strings. Exiting.");
+        return;
+    }
+    console.log(`Found ${Object.keys(sourceStringsFlat).length} strings to process.`);
 
-    let overallHasActualChanges = false; // Flag to track if ANY locale file was actually updated
+    // 2. Loop through each configured locale and translate.
+    for (const locale of LOCALE_CONFIGS) {
+      console.log(`\n--- Processing locale: ${locale.name} (${locale.folder}) ---`);
+      const targetYamlPath = `generated/${locale.folder}/global.yaml`;
+      const targetDirectory = path.dirname(targetYamlPath);
 
-    // --- Loop through each locale ---
-    for (const localeConfig of LOCALE_CONFIGS) {
-      const localeFolder = localeConfig.folder;
-      const targetLangName = localeConfig.name;
+      let finalLocaleStrings = {}; // Start with a fresh object for the new translations.
 
-      const currentTargetYamlPath = `generated/${localeFolder}/global.yaml`;
-      const currentTargetDirectory = path.dirname(currentTargetYamlPath);
-
-      console.log(
-        `\n--- Processing locale: ${targetLangName} (${localeFolder}) ---`,
-      );
-
-      let existingLocaleStrings = {};
-      const isNewLocaleFile = !fs.existsSync(currentTargetYamlPath); // Check existence here
-      if (isNewLocaleFile) {
-        console.log(
-          `Target file ${currentTargetYamlPath} does not exist. It will be created and fully populated.`,
-        );
-      } else {
-        console.log(`Loading existing target file: ${currentTargetYamlPath}`);
-        const existingTargetContent = fs.readFileSync(
-          currentTargetYamlPath,
-          "utf8",
-        );
-        existingLocaleStrings = yaml.load(existingTargetContent);
+      // 3. Translate all strings from the source file.
+      for (const key of Object.keys(sourceStringsFlat)) {
+        const englishText = sourceStringsFlat[key];
+        const translatedText = await translateString(englishText, locale.name);
+        setDeep(finalLocaleStrings, key, translatedText);
       }
 
-      const finalLocaleStrings = JSON.parse(
-        JSON.stringify(existingLocaleStrings),
-      );
-      let hasChangesForThisLocale = false; // Flag for this specific locale's changes
+      // 4. Clean up the final object by ensuring it matches the source structure.
+      // (This step is implicitly handled by building `finalLocaleStrings` from `sourceStringsFlat`,
+      // but we can run `removeDeletedKeys` as a safeguard if we were merging with an old file.)
+      // For this simplified script, building fresh is cleaner.
 
-      // --- Handle Deleted Keys ---
-      // Only remove deleted keys if it's NOT a new locale file (no need to delete from an empty new file)
-      console.log(`[${localeFolder}] Checking for deleted keys...`);
-      if (
-        !isNewLocaleFile &&
-        removeDeletedKeys(finalLocaleStrings, currentEnglishStrings)
-      ) {
-        hasChangesForThisLocale = true;
-      }
-
-      // --- Determine strings to translate for THIS locale ---
-      let stringsToTranslateForThisLocale = {};
-      if (isNewLocaleFile) {
-        // If it's a new file, translate ALL strings from the current English source
-        console.log(
-          `[${localeFolder}] New locale file detected. Translating all strings from source.`,
-        );
-        stringsToTranslateForThisLocale = getAllStringsFromObject(
-          currentEnglishStrings,
-        );
-      } else {
-        // Otherwise, only translate strings that changed in the source (current vs previous source)
-        console.log(
-          `[${localeFolder}] Existing locale file. Identifying added/modified strings from source changes.`,
-        );
-        stringsToTranslateForThisLocale = getChangedStrings(
-          currentEnglishStrings,
-          previousEnglishStrings,
-        );
-      }
-
-      const changedKeys = Object.keys(stringsToTranslateForThisLocale);
-
-      if (changedKeys.length === 0 && !hasChangesForThisLocale) {
-        console.log(
-          `[${localeFolder}] No new, modified, or deleted strings found. Skipping translation for this locale.`,
-        );
-        continue; // Move to the next locale
-      }
-
-      if (changedKeys.length > 0) {
-        console.log(
-          `[${localeFolder}] Found ${changedKeys.length} strings to translate/update.`,
-        );
-        console.log(
-          `[${localeFolder}] Keys to translate:`,
-          changedKeys.join(", "),
-        );
-
-        for (const key of changedKeys) {
-          const englishText = stringsToTranslateForThisLocale[key];
-          const translatedText = await translateString(
-            englishText,
-            targetLangName,
-          );
-
-          let currentTranslatedValue;
-          try {
-            currentTranslatedValue = key
-              .split(".")
-              .reduce((o, i) => o && o[i], finalLocaleStrings);
-          } catch (e) {
-            currentTranslatedValue = undefined;
-          }
-
-          if (translatedText !== currentTranslatedValue) {
-            setDeep(finalLocaleStrings, key, translatedText);
-            hasChangesForThisLocale = true;
-            console.log(
-              `[${localeFolder}] Updated translation for key "${key}"`,
-            );
-          } else {
-            console.log(
-              `[${localeFolder}] No change in translated text for key "${key}", skipping update.`,
-            );
-          }
-        }
-      }
-
-      if (!hasChangesForThisLocale) {
-        console.log(
-          `[${localeFolder}] No actual content changes (additions, modifications, or deletions) detected. No file write needed for this locale.`,
-        );
-        continue; // Move to the next locale
-      }
-
-      // 5. Dump the final content back into YAML format for this locale
-      console.log(
-        `[${localeFolder}] Dumping final ${targetLangName} content to YAML...`,
-      );
-
-      const dumpedYaml = yaml.dump(finalLocaleStrings, {
+      // 5. Save the translated strings to the target YAML file.
+      console.log(`> Writing translations to ${targetYamlPath}`);
+      const newYamlContent = yaml.dump(finalLocaleStrings, {
         lineWidth: -1,
         quotingType: '"',
         forceQuotes: true,
       });
 
-      // 6. Ensure the target directory exists for this locale
-      if (!fs.existsSync(currentTargetDirectory)) {
-        console.log(
-          `[${localeFolder}] Creating target directory: ${currentTargetDirectory}`,
-        );
-        fs.mkdirSync(currentTargetDirectory, { recursive: true });
-      }
+      fs.mkdirSync(targetDirectory, { recursive: true });
+      fs.writeFileSync(targetYamlPath, newYamlContent, "utf8");
 
-      // 7. Write the content to the target YAML file for this locale
-      console.log(
-        `[${localeFolder}] Writing updated translated content to target file: ${currentTargetYamlPath}`,
-      );
-      fs.writeFileSync(currentTargetYamlPath, dumpedYaml, "utf8");
-
-      console.log(
-        `[${localeFolder}] Successfully updated changed strings in '${currentTargetYamlPath}'`,
-      );
-      overallHasActualChanges = true; // Mark that at least one file was updated
-    } // End of locale loop
-
-    if (!overallHasActualChanges) {
-      console.log(
-        "No changes detected in any locale file across all configured locales. Exiting successfully without creating a PR.",
-      );
-      process.exit(0);
+      console.log(`✔ Successfully updated translations for ${locale.name}.`);
     }
 
-    console.log(
-      "Translation process completed for all locales. Changes detected, proceeding to PR creation.",
-    );
+    console.log("\nTranslation process completed successfully for all locales.");
+
   } catch (error) {
-    console.error(`Fatal error in translation process: ${error.message}`);
+    console.error(`\nFatal error in translation process: ${error.message}`);
+    console.error(error.stack);
     process.exit(1);
   }
 }
