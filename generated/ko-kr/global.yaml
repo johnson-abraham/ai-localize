@@ -3,13 +3,14 @@ components:
     rubric:
       template:
         criteria: "기준 {idx_LOCALIZED}"
-        column1: "훌륭합니다"
+        column1: "훌륭한"
         column2: "만족스러운"
         column3: "불만족스러운"
         column4: "가난한"
       newCriteriaHeading: "새로운 기준"
       newColumnHeading: "새로운 레벨"
       newCopyTitle: "{rubricTitle} {date} 복사"
-      persistError: "루브릭 저장 중에 오류가 발생했습니다. 페이지를 새로고침하고 나중에 다시 시도해 주세요."
-      persistSuccess: "\"루브릭을 성공적으로 저장했습니다.\""
+      persistError: "루브릭을 저장하는 동안 오류가 발생했습니다. 페이지를 새로고침하고 나중에 다시 시도하십시오."
+      persistSuccess: "루브릭이 성공적으로 저장되었습니다."
       label: "{studentName} 님께 피드백을 제공하기 위해 텍스트 편집기를 엽니다."
+      text: "안녕하세요 세계"
