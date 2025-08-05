@@ -13,4 +13,3 @@ components:
       persistError: "루브릭 저장 중 오류가 발생했습니다. 페이지를 새로고침하고 나중에 다시 시도해 주세요."
       persistSuccess: "\"루브릭을 성공적으로 저장했습니다.\""
       label: "{studentName} 님에 대한 피드백을 제공하기 위해 텍스트 편집기를 엽니다."
-      text: "안녕하세요"

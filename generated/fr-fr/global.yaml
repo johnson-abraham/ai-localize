@@ -13,4 +13,3 @@ components:
       persistError: "Une erreur s'est produite lors de l'enregistrement de la grille d'évaluation. Veuillez rafraîchir la page et réessayer plus tard."
       persistSuccess: "Rubrique persistée avec succès."
       label: "Ouvrez l'éditeur de texte pour fournir un commentaire pour {studentName}"
-      text: "Bonjour"
