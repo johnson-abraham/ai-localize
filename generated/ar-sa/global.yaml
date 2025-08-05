@@ -12,4 +12,5 @@ components:
       newCopyTitle: "{rubricTitle} {date} نسخة"
       persistError: "حدث خطأ أثناء حفظ نموذج التقييم. يرجى تحديث الصفحة والمحاولة مرة أخرى لاحقًا."
       persistSuccess: "تم حفظ معايير التقييم بنجاح."
-      label: "افتح محرر النصوص لتقديم ملاحظات لـ {studentName}"
+      label: "الرجاء فتح محرر النصوص لتقديم ملاحظات لـ {studentName}"
+      text: "مرحباً بالعالم"
