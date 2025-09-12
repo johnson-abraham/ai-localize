@@ -12,5 +12,5 @@ components:
       newCopyTitle: "{rubricTitle} {date} kopia"
       persistError: "Wystąpił błąd podczas zapisywania schematu oceny. Odśwież stronę i spróbuj ponownie później."
       persistSuccess: "Pomyślnie utrwalono rubrykę."
-      label: "Proszę otworzyć edytor tekstu, aby przesłać opinię dla {studentName}"
-      text: "Witaj świecie"
+      text: "Cześć"
+      failure: "Nie udało się utrwalić rubryki."
