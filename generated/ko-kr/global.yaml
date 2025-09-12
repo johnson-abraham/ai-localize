@@ -14,3 +14,4 @@ components:
       persistSuccess: "\"루브릭을 성공적으로 저장했습니다.\""
       label: "{studentName}님에 대한 피드백을 제공하기 위해 텍스트 편집기를 열어주세요."
       text: "안녕하세요 세상"
+      persist: "루브릭 저장"

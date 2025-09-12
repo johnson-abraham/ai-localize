@@ -14,3 +14,4 @@ components:
       persistSuccess: "Rubrique persistée avec succès."
       label: "Veuillez ouvrir l'éditeur de texte pour fournir un retour à {studentName}"
       text: "Bonjour le monde"
+      persist: "Enregistrer la rubrique"

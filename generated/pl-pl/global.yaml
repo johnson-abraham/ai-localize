@@ -14,3 +14,4 @@ components:
       persistSuccess: "Pomyślnie utrwalono rubrykę."
       label: "Proszę otworzyć edytor tekstu, aby przesłać opinię dla {studentName}"
       text: "Witaj świecie"
+      persist: "Zapisz kryteria oceny"

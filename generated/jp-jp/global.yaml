@@ -14,3 +14,4 @@ components:
       persistSuccess: "ルーブリックを正常に永続化しました。"
       label: "{studentName}さんへのフィードバックを提供するために、テキストエディタを開いてください。"
       text: "こんにちは世界"
+      persist: "ルーブリックを保存"

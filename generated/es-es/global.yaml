@@ -14,3 +14,4 @@ components:
       persistSuccess: "Rúbrica guardada correctamente."
       label: "Por favor, abre el editor de texto para dar tu opinión sobre {studentName}"
       text: "Hola Mundo"
+      persist: "Guardar rúbrica"

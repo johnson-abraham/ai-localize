@@ -14,3 +14,4 @@ components:
       persistSuccess: "تم حفظ معايير التقييم بنجاح."
       label: "الرجاء فتح محرر النصوص لتقديم ملاحظات لـ {studentName}"
       text: "مرحباً بالعالم"
+      persist: "حفظ المعيار"
