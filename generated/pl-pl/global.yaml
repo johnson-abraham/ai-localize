@@ -13,4 +13,4 @@ components:
       persistError: "Wystąpił błąd podczas zapisywania schematu oceny. Odśwież stronę i spróbuj ponownie później."
       persistSuccess: "Pomyślnie utrwalono rubrykę."
       label: "Proszę otworzyć edytor tekstu, aby przesłać opinię dla {studentName}"
-      text: "Cześć"
+      text: "Witaj świecie"
