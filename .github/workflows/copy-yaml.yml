@@ -35,7 +35,7 @@ jobs:
         run: node .github/scripts/copy_yaml.js
         env:
           SOURCE_YAML_PATH: src/global.yaml
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           # The script now needs the CURRENT SHA to save to the state file
           GITHUB_SHA: ${{ github.sha }}
 

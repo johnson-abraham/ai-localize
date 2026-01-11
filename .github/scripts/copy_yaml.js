@@ -34,7 +34,7 @@ if (!sourceYamlPath) {
   process.exit(1);
 }
 if (!aiAPIKey) {
-  console.error("Error: GEMINI_API_KEY environment variable is not set.");
+  console.error("Error: OPENAI_API_KEY environment variable is not set.");
   process.exit(1);
 }
 
