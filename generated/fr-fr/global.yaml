@@ -12,5 +12,5 @@ components:
       newCopyTitle: "\"{rubricTitle} {date} copie\""
       persistError: "Une erreur s'est produite lors de l'enregistrement de la grille d'évaluation. Veuillez rafraîchir la page et réessayer plus tard."
       persistSuccess: "Rubrique persistée avec succès."
-      text: "Bonjour"
+      text: "Bonjour le monde"
       failure: "Échec de la persistance de la grille."
