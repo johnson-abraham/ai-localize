@@ -12,5 +12,5 @@ components:
       newCopyTitle: "{rubricTitle} {date} copia"
       persistError: "Se ha producido un error al guardar la rúbrica. Por favor, actualiza la página e inténtalo de nuevo más tarde."
       persistSuccess: "Rúbrica guardada correctamente."
-      text: "Hola"
+      text: "Hola Mundos"
       failure: "Error al guardar la rúbrica."
