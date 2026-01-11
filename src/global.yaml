@@ -13,4 +13,4 @@ components:
       persistError: "An error occurred while saving the rubric. Please refresh the page and try again later."
       persistSuccess: "Successfully persisted the rubric."
       failure: "Failed to persist the rubric."
-      text: "Hello"
+      text: "Hello All"
