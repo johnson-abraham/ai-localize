@@ -12,5 +12,5 @@ components:
       newCopyTitle: "{rubricTitle} {date} نسخة"
       persistError: "حدث خطأ أثناء حفظ نموذج التقييم. يرجى تحديث الصفحة والمحاولة مرة أخرى لاحقًا."
       persistSuccess: "تم حفظ معايير التقييم بنجاح."
-      text: "مرحباً بالعالم"
+      text: "مرحبا بالجميع"
       failure: "فشل في حفظ المعيار."
