@@ -19,8 +19,8 @@
   "homepage": "https://github.com/johnson-abraham/ai-localize#readme",
   "description": "",
   "dependencies": {
-    "@google/genai": "^1.10.0",
-    "js-yaml": "^4.1.0"
+    "js-yaml": "^4.1.0",
+    "openai": "^6.16.0"
   },
   "devDependencies": {
     "prettier": "3.6.2"
